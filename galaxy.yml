@@ -1,0 +1,45 @@
+---
+
+namespace: bodsch
+name: php
+
+version: 0.0.1
+
+readme: README.md
+
+authors:
+  - Bodo Schulz <bodo@boone-schulz.de>
+
+description: A collection of Ansible roles for PHP.
+
+license:
+  - Apache-2.0
+
+license_file: ''
+
+tags:
+  - programing
+  - language
+  - php
+  - fpm
+  - pecl
+  - web
+
+dependencies:
+  bodsch.core: ">=2.2.4"
+
+repository: https://github.com/bodsch/ansible-collection-php
+documentation: https://github.com/bodsch/ansible-collection-php/README.md
+homepage: https://github.com/bodsch/ansible-collection-php
+issues: https://github.com/bodsch/ansible-collection-php/issues
+
+build_ignore:
+  - "galaxy.yml"
+  - "*.pyc"
+  - "*.retry"
+  - ".ansible-lint"
+  - ".editorconfig"
+  - ".flake8"
+  - ".gitignore"
+  - ".yamllint"
+  - ".github"

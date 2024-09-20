@@ -1,0 +1,16 @@
+---
+
+- name: clear pecl cache
+  bodsch.php.php_pecl:
+    state: "clear-cache"
+  register: php_pecl_pecl_result
+
+- name: remove build dependencies
+  become: true
+  ansible.builtin.package:
+    name: "{{ php_pecl_build_dependecies }}"
+    state: absent
+  when:
+    - php_pecl_build_dependecies | default([]) | count > 0
+
+...

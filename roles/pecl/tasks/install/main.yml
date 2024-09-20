@@ -1,0 +1,110 @@
+---
+
+# READ local_facts
+- name: set local fact for container
+  ansible.builtin.set_fact:
+    installed_php_version: "{{ ansible_local.php_fpm.version }}"
+  when:
+    - ansible_local.php_fpm is defined
+    - ansible_local.php_fpm.version is defined
+    - ansible_local.php_fpm.version | length != 0
+  tags:
+    - php_pecl_install
+
+- name: d
+  debug:
+    msg: "{{ installed_php_version }}"
+
+- name: re-include OS specific configuration
+  ansible.builtin.include_vars: "{{ lookup('first_found', params) }}"
+  vars:
+    params:
+      paths:
+        - "vars"
+      files:
+        # eg. debian-10 / ubuntu-20.04 / centos-8 / oraclelinux-8
+        - "{{ ansible_distribution | lower }}-{{ ansible_distribution_major_version }}.yml"
+        # eg. archlinux-systemd / archlinux-openrc
+        - "{{ ansible_distribution | lower }}-{{ ansible_service_mgr | lower }}.yml"
+        # eg. artixlinux
+        - "{{ ansible_distribution | lower | replace(' ', '') }}.yml"
+        # eg. debian / ubuntu / centos / oraclelinux
+        - "{{ ansible_distribution | lower }}.yml"
+        # eg. redhat / debian / archlinux
+        - "{{ ansible_os_family | lower }}.yml"
+        - default.yml
+      skip: true
+
+- name: install
+  ansible.builtin.include_tasks: install/prepare.yml
+  tags:
+    - php_pecl_install
+
+# TODO
+# detect installed pecl extensions and versions
+- name: check installed pecl extension
+  bodsch.php.php_pecl:
+    state: check
+    packages: "{{ php_pecl_extensions }}"
+    php_config:
+      module_dir: "{{ php_modules_conf_paths }}"
+      config_dirs: "{{ php_extension_conf_paths }}"
+  register: php_pecl_check
+
+- name: define dependecies
+  set_fact:
+    php_pecl_build: true
+    php_pecl_extensions: "{{ php_pecl_check.missing | default([]) }}"
+    php_pecl_build_dependecies: "{{ php_pecl_defaults_build_dependecies + php_pecl_check.missing | bodsch.php.dependencies() }}"
+  when:
+    - php_pecl_check.missing | default([]) | count > 0
+
+- name: install build dependencies for pecl packages
+  become: true
+  ansible.builtin.package:
+    name: "{{ php_pecl_build_dependecies }}"
+    state: present
+  when:
+    - php_pecl_build_dependecies | default([]) | count > 0
+
+- name: update pecl channel
+  bodsch.php.php_pecl:
+    state: "channel-update"
+  register: php_pecl_pecl_result
+
+# - name: d
+#   debug:
+#     msg: "{{ php_pecl_pecl_result }}"
+
+# - name: install pecl extensions
+#   bodsch.php.php_pecl:
+#     state: check
+#     packages: "{{ php_pecl_extensions }}"
+#     php_config:
+#       module_dir: "{{ php_modules_conf_paths }}"
+#       config_dirs: "{{ php_extension_conf_paths }}"
+# #        - /etc/php/{{ installed_php_version.full }}/cli/conf.d
+# #        - /etc/php/{{ installed_php_version.full }}/fpm/conf.d
+#   register: php_pecl_pecl_result
+
+- name: install pecl extensions
+  bodsch.php.php_pecl:
+    state: install
+    packages: "{{ php_pecl_extensions }}"
+    php_config:
+      module_dir: "{{ php_modules_conf_paths }}"
+      config_dirs: "{{ php_extension_conf_paths }}"
+  register: php_pecl_pecl_result
+
+# - name: pecl stuff
+#   block:
+#     - name: Install PECL libaries.
+#       shell: "yes '' | {{ php_pecl_install_command }} {{ item }}"
+#       register: php_pecl_pecl_result
+#       changed_when: php_pecl_pecl_result is succeeded
+#       failed_when: "not (('already installed' in php_pecl_pecl_result.stdout) or ('install ok:' in php_pecl_pecl_result.stdout))"
+#       loop: "{{ php_pecl_extensions }}"
+
+- name: d
+  debug:
+    msg: "{{ php_pecl_pecl_result }}"

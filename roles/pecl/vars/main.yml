@@ -1,0 +1,21 @@
+---
+
+php_pecl_build: false
+
+php_pecl_defaults_build_dependecies: []
+
+php_pecl_install_command: "pecl install"
+
+php_conf_paths:
+  - /etc/php/{{ installed_php_version.package }}/fpm
+  - /etc/php/{{ installed_php_version.package }}/cli
+
+php_extension_conf_paths:
+  - /etc/php/{{ installed_php_version.package }}/fpm/conf.d
+  - /etc/php/{{ installed_php_version.package }}/cli/conf.d
+
+php_pecl_conf_path: /etc/php/{{ installed_php_version.package }}
+
+php_modules_conf_paths: /etc/php/{{ installed_php_version.package }}/mods-available
+
+...

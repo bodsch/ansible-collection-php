@@ -1,0 +1,9 @@
+---
+
+- name: ensure php-fpm is started and enabled at boot
+  ansible.builtin.service:
+    name: "{{ php_fpm_daemon }}"
+    state: started
+    enabled: true
+
+...

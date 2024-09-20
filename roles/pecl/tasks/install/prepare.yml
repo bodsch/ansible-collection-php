@@ -1,0 +1,56 @@
+---
+
+- name: install pear (debian)
+  become: true
+  ansible.builtin.package:
+    name: php-pear
+    state: present
+  when:
+    - ansible_os_family | lower == "debian"
+
+- name: install pear (archlinux)
+  become: true
+  when:
+    - ansible_os_family | lower == "archlinux"
+  block:
+    - name: "[archlinux] install build tools"
+      ansible.builtin.package:
+        name:
+          - base-devel
+          - diffutils
+          - fakeroot
+          - make
+        state: present
+
+    - name: "archlinux : create sudo rules for aur_builder"
+      ansible.builtin.copy:
+        content: '%aur_builder ALL=(ALL) NOPASSWD: ALL'
+        dest: /etc/sudoers.d/aur
+        mode: 0640
+        validate: visudo -cf %s
+
+    - name: "archlinux : create build group"
+      ansible.builtin.group:
+        name: aur_builder
+
+    - name: "archlinux : create build user"
+      ansible.builtin.user:
+        name: aur_builder
+        group: aur_builder
+
+    - name: "archlinux : update package cache"
+      ansible.builtin.package:
+        update_cache: true
+
+    - name: "archlinux : install php-pear package via aur"
+      become: true
+      become_user: aur_builder
+      bodsch.core.aur:
+        state: present
+        name: php-pear
+        repository: https://aur.archlinux.org/php-pear.git
+        extra_args:
+          - --skippgpcheck
+      async: 3200
+      poll: 10
+      register: _pear_installed

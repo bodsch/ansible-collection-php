@@ -1,0 +1,17 @@
+---
+
+php_pecl_defaults_build_dependecies: []
+  #- php-dev
+  #- php-pear
+
+php_conf_paths:
+  - /etc/php
+
+php_extension_conf_paths:
+  - /etc/php/conf.d
+
+php_pecl_conf_path: /etc/php
+
+php_modules_conf_paths: /etc/php/mods-available
+
+...

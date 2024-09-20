@@ -1,0 +1,81 @@
+---
+
+# - name: detect available php version
+#   bodsch.php.php_version:
+#     package_version: "{{ php_version }}"
+#   register: detected_php_version
+#
+# - name: "set php_version '{{ detected_php_version.available.version }}'"
+#   ansible.builtin.set_fact:
+#     php_version: "{{ detected_php_version.available.version }}"
+#     php_package_version: "{{ detected_php_version.available.package_version }}"
+#     php_major_version: "{{ detected_php_version.available.major_version }}"
+#   when:
+#     - not detected_php_version.failed
+#     - detected_php_version.available is defined
+#     - detected_php_version.available.version is defined
+#     - detected_php_version.available.package_version is defined
+#     - detected_php_version.available.major_version is defined
+
+- name: install build dependencies
+  become: true
+  ansible.builtin.package:
+    name: "{{ php_pecl_build_dependecies }}"
+    state: present
+  when:
+    - php_pecl_build_dependecies | default([]) | count > 0
+
+# TODO?
+# use "pecl channel-update pecl.php.net"
+
+- name: update pecl channel
+  bodsch.php.php_pecl:
+    state: "channel-update"
+    # packages: "{{ php_pecl_extensions }}"
+    # php_config:
+    #   module_dir: /etc/php/{{ php_version }}/mods-available
+    #   config_dirs:
+    #     - /etc/php/{{ php_version }}/cli/conf.d
+    #     - /etc/php/{{ php_version }}/fpm/conf.d
+  register: php_pecl_pecl_result
+
+# - name: d
+#   debug:
+#     msg: "{{ php_pecl_pecl_result }}"
+
+- name: install pecl extensions
+  bodsch.php.php_pecl:
+    state: check
+    packages: "{{ php_pecl_extensions }}"
+    php_config:
+      module_dir: /etc/php/{{ installed_php_version.full }}/mods-available
+      config_dirs:
+        - /etc/php/{{ installed_php_version.full }}/cli/conf.d
+        - /etc/php/{{ installed_php_version.full }}/fpm/conf.d
+  register: php_pecl_pecl_result
+
+- name: install pecl extensions
+  bodsch.php.php_pecl:
+    state: install
+    packages: "{{ php_pecl_extensions }}"
+    php_config:
+      module_dir: /etc/php/{{ installed_php_version.full }}/mods-available
+      config_dirs:
+        - /etc/php/{{ installed_php_version.full }}/cli/conf.d
+        - /etc/php/{{ installed_php_version.full }}/fpm/conf.d
+  register: php_pecl_pecl_result
+
+# - name: pecl stuff
+#   block:
+#     - name: Install PECL libaries.
+#       shell: "yes '' | {{ php_pecl_install_command }} {{ item }}"
+#       register: php_pecl_pecl_result
+#       changed_when: php_pecl_pecl_result is succeeded
+#       failed_when: "not (('already installed' in php_pecl_pecl_result.stdout) or ('install ok:' in php_pecl_pecl_result.stdout))"
+#       loop: "{{ php_pecl_extensions }}"
+
+- name: d
+  debug:
+    msg: "{{ php_pecl_pecl_result }}"
+
+...

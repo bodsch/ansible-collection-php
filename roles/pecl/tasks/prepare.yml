@@ -1,0 +1,70 @@
+---
+
+- name: include OS specific configuration
+  ansible.builtin.include_vars: "{{ lookup('first_found', params) }}"
+  vars:
+    params:
+      paths:
+        - "vars"
+      files:
+        # eg. debian-10 / ubuntu-20 / centos-8 / oraclelinux-8
+        - "{{ ansible_distribution | lower }}-{{ ansible_distribution_major_version }}.yml"
+        # eg. archlinux-systemd / archlinux-openrc
+        - "{{ ansible_distribution | lower }}-{{ ansible_service_mgr | lower }}.yml"
+        # eg. debian / ubuntu / centos / oraclelinux
+        - "{{ ansible_distribution | lower }}.yml"
+        # eg. redhat / debian
+        - "{{ ansible_os_family | lower }}.yml"
+        # artixlinux
+        - "{{ ansible_os_family | lower | replace(' ', '') }}.yml"
+        - default.yml
+      skip: true
+
+# - name: update package cache
+#   ansible.builtin.package:
+#     update_cache: true
+
+- name: do facts module to get latest information
+  ansible.builtin.setup:
+    gather_subset:
+      - '!all'
+      - '!any'
+      - facter
+
+# # READ local_facts
+# - name: set local fact for container
+#   ansible.builtin.set_fact:
+#     installed_php_version: "{{ ansible_local.php_fpm.version }}"
+#   when:
+#     - ansible_local.php_fpm is defined
+#     - ansible_local.php_fpm.version is defined
+#     - ansible_local.php_fpm.version | length != 0
+#
+# - name: install pear (debian)
+#   become: true
+#   ansible.builtin.package:
+#     name: php-pear
+#     state: present
+#   when:
+#     - ansible_os_family | lower == "debian"
+#
+# # TODO
+# # detect installed pecl extensions and versions
+# - name: check installed pecl extension
+#   bodsch.php.php_pecl:
+#     state: check
+#     packages: "{{ php_pecl_extensions }}"
+#     php_config:
+#       module_dir: /etc/php/{{ installed_php_version.full }}/mods-available
+#       config_dirs:
+#         - /etc/php/{{ installed_php_version.full }}/cli/conf.d
+#         - /etc/php/{{ installed_php_version.full }}/fpm/conf.d
+#   register: php_pecl_check
+#
+# - name: define dependecies
+#   set_fact:
+#     php_pecl_build: true
+#     php_pecl_extensions: "{{ php_pecl_check.missing | default([]) }}"
+#     php_pecl_build_dependecies: "{{ php_pecl_defaults_build_dependecies + php_pecl_check.missing | bodsch.php.dependencies() }}"
+#   when:
+#     - php_pecl_check.missing | default([]) | count > 0

@@ -1,0 +1,26 @@
+---
+
+php_defaults_packages:
+  - php{{ php_major_version }}
+  - php{{ php_major_version }}-fpm
+  - php{{ php_major_version }}-fpm-openrc
+
+php_conf_paths:
+  - /etc/php{{ php_major_version }}
+
+php_extension_conf_paths:
+  - /etc/php{{ php_major_version }}/conf.d
+
+php_fpm_daemon: php{{ php_major_version }}-fpm
+
+php_fpm_pool_user_default: http
+
+php_fpm_conf_path: /etc/php{{ php_major_version }}
+
+php_fpm_pool_conf_path: /etc/php{{ php_major_version }}/php-fpm.d
+
+php_webserver_daemon: nginx
+
+php_modules_conf_paths: /etc/php{{ php_major_version }}/mods-available
+
+...

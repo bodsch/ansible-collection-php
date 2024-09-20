@@ -1,0 +1,51 @@
+---
+
+- name: warn against the use of obsolete variables
+  when:
+    - php_custom_packages | default([]) | count > 0
+  block:
+    - name: warn against the use of obsolete variables  # noqa ignore-errors
+      ansible.builtin.fail:
+        msg: |
+          The use of `php_custom_packages` is obsolete!
+          Please use `php_packages` instead!
+          The obsolete variable is automatically converted internally.
+          The conversion will be removed in one of the next releases!
+      ignore_errors: true
+
+    - name: wait 5 seconds to realise the message
+      delegate_to: localhost
+      ansible.builtin.wait_for:
+        timeout: 10
+
+    - name: convert obsolete variable ...
+      ansible.builtin.set_fact:
+        php_packages: "{{ php_packages + php_custom_packages }}"
+        php_custom_packages: []
+
+- name: add php version to various php packages
+  ansible.builtin.set_fact:
+    php_packages: "{{ php_packages | bodsch.php.add_php_version(version=detected_php_version.available, os_family=ansible_os_family) }}"
+
+- name: merge php defaults and custom packages
+  ansible.builtin.set_fact:
+    php_packages: "{{ php_defaults_packages + php_packages | default([]) | ansible.builtin.unique }}"
+
+- name: ensure PHP packages are installed.
+  ansible.builtin.package:
+    name: "{{ php_packages }}"
+    state: "{{ php_packages_state }}"
+  when:
+    - php_packages | default([]) | count > 0
+
+- name: create openrc init script
+  ansible.builtin.template:
+    src: init/openrc/init.d/php-fpm.j2
+    dest: /etc/init.d/php{{ php_major_version }}-fpm
+    mode: 0755
+  notify:
+    - restart php-fpm
+  when:
+    - ansible_service_mgr | lower == 'openrc'
+
+...

@@ -1,0 +1,43 @@
+---
+
+- name: delete the default pool configuration file
+  ansible.builtin.file:
+    path: "{{ php_fpm_pool_conf_path }}/{{ php_fpm_default_pool.name }}"
+    state: absent
+  when:
+    - php_fpm_default_pool.delete
+
+- name: assert needed pool variables
+  ansible.builtin.assert:
+    msg: "needed variable are not defined"
+    that:
+      - item.group is defined
+      - item.pm is defined and (item.pm in ['static','dynamic','ondemand'])
+      - item['pm.max_children'] is defined
+      - item['pm.start_servers'] is defined
+      - item['pm.min_spare_servers'] is defined
+      - item['pm.max_spare_servers'] is defined
+    quiet: true
+  when:
+    - php_fpm_pools | length > 0
+  loop:
+    "{{ php_fpm_pools }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: create pool configuration
+  ansible.builtin.template:
+    src: pool.conf.j2
+    dest: "{{ php_fpm_pool_conf_path }}/{{ item.name }}.conf"
+    mode: 0644
+    backup: true
+  loop:
+    "{{ php_fpm_pools }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when:
+    - php_fpm_pools | length > 0
+  notify:
+    - restart php-fpm
+
+...

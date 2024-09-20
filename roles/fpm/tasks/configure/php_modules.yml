@@ -1,0 +1,31 @@
+---
+
+- name: PHP modules
+  when:
+    - php_modules_conf_paths is defined
+    - php_modules_conf_paths | string | length > 0
+  block:
+    - name: ensure the modules directory {{ php_modules_conf_paths }} exists
+      ansible.builtin.file:
+        path: "{{ php_modules_conf_paths }}"
+        state: directory
+        owner: root
+        group: root
+        mode: 0755
+      when:
+        - php_modules_conf_paths is defined
+
+    - name: configure modules
+      bodsch.php.php_modules:
+        php_modules: "{{ php_modules }}"
+        php_modules_path: "{{ php_modules_conf_paths }}"
+        dest: "{{ php_conf_paths }}"
+        # force: true
+      register: _modules_state
+      notify:
+        - module state
+      when:
+        - php_modules is defined
+
+
+...

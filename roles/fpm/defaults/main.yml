@@ -1,0 +1,80 @@
+---
+
+# choose your version!
+php_version: "8"
+
+# PHP package state; use 'present' to make sure it's installed, or 'latest' if
+# you want to upgrade or switch versions using a new repo.
+php_packages_state: present
+
+php_fpm_log_directory: /var/log/php-fpm
+php_fpm_tmp_upload_directory: /tmp/php-fpm
+php_fpm_socket_directory: /run/php
+
+php_fpm_global: {}
+
+# Possible Values: alert, error, warning, notice, debug
+php_fpm_log_level: notice
+
+# PHP-FPM configuration.
+php_enable_php_fpm: true
+
+php_fpm_listen: "127.0.0.1:9000"
+php_fpm_listen_allowed_clients: "127.0.0.1"
+php_fpm_pm:
+  max_children: 50
+  start_servers: 5
+  spare_servers:
+    min: 5
+    max: 5
+
+# If this is set to false, none of the following options will have any effect.
+# Any and all changes to /etc/php.ini will be your responsibility.
+php_use_managed_ini: true
+
+php_expose_php: "On"
+php_memory_limit: "256M"
+php_max_execution_time: "60"
+php_max_input_time: "60"
+php_max_input_vars: "1000"
+php_realpath_cache_size: "32K"
+
+php_file_uploads: "On"
+php_upload_max_filesize: "64M"
+php_max_file_uploads: "20"
+
+php_post_max_size: "32M"
+php_date_timezone: "Europe/Berlin"
+php_allow_url_fopen: "On"
+
+php_sendmail_path: "/usr/sbin/sendmail -t -i"
+php_output_buffering: "4096"
+php_short_open_tag: "Off"
+php_disable_functions: []
+
+php_session_cookie_lifetime: 0
+php_session_gc_probability: 1
+php_session_gc_divisor: 1000
+php_session_gc_maxlifetime: 1440
+php_session_save_handler: files
+php_session_save_path: ''
+php_session_cache_expire: 180
+
+php_error_reporting: "E_ALL & ~E_DEPRECATED & ~E_STRICT"
+php_display_errors: "Off"
+php_display_startup_errors: "Off"
+
+php_packages: []
+# OBSOLETE
+# replaced by `php_packages`
+php_custom_packages: []
+
+php_fpm_default_pool:
+  delete: false
+  name: www.conf
+
+# for example
+php_fpm_pools: []
+
+# php modules
+php_modules: []

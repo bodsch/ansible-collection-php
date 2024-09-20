@@ -1,0 +1,17 @@
+[flake8]
+
+# E221 multiple spaces before operator
+# E251 unexpected spaces around keyword / parameter equals
+# W605 invalid escape sequence
+
+ignore = E221,E251,W605
+
+exclude =
+  # No need to traverse our git directory
+  .git,
+  # There's no value in checking cache directories
+  __pycache__,
+  .tox
+
+max-line-length = 195
+

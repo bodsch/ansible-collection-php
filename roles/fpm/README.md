@@ -1,5 +1,5 @@
 
-# Ansible Role:  `php`
+# Ansible Role:  `bodsch.php.fpm`
 
 Ansible role to install fpm-php on various systems.
 
@@ -10,42 +10,6 @@ Detect available PHP Version based on `php_version` Variable.
 Supports PHP version 7 and 8, **as long as the corresponding versions are available.**
 
 ArchLinux has removed the PHP 7 packages from their repository!
-
-[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/bodsch/ansible-php/main.yml?branch=main)][ci]
-[![GitHub issues](https://img.shields.io/github/issues/bodsch/ansible-php)][issues]
-[![GitHub release (latest by date)](https://img.shields.io/github/v/release/bodsch/ansible-php)][releases]
-[![Ansible Downloads](https://img.shields.io/ansible/role/d/bodsch/php?logo=ansible)][galaxy]
-
-[ci]: https://github.com/bodsch/ansible-php/actions
-[issues]: https://github.com/bodsch/ansible-php/issues?q=is%3Aopen+is%3Aissue
-[releases]: https://github.com/bodsch/ansible-php/releases
-[galaxy]: https://galaxy.ansible.com/ui/standalone/roles/bodsch/php
-
-## Requirements & Dependencies
-
-Ansible Collections
-
-- [bodsch.core](https://github.com/bodsch/ansible-collection-core)
-
-```bash
-ansible-galaxy collection install bodsch.core
-```
-or
-```bash
-ansible-galaxy collection install --requirements-file collections.yml
-```
-
-
-### Operating systems
-
-Tested on
-
-* ArchLinux (**only PHP 8!**)
-* Debian based
-    - Debian 12
-    - Ubuntu 22.04
-
-> **RedHat-based systems are no longer officially supported! May work, but does not have to.**
 
 
 ## usage
@@ -220,24 +184,3 @@ Under [documentation](documentation) you can find some module configurations tha
 
 ---
 
-## Contribution
-
-Please read [Contribution](CONTRIBUTING.md)
-
-## Development,  Branches (Git Tags)
-
-The `master` Branch is my *Working Horse* includes the "latest, hot shit" and can be complete broken!
-
-If you want to use something stable, please use a [Tagged Version](https://github.com/bodsch/ansible-php/tags)!
-
----
-
-## Author
-
-- Bodo Schulz
-
-## License
-
-[Apache](LICENSE)
-
-**FREE SOFTWARE, HELL YEAH!**

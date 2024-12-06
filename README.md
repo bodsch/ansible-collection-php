@@ -18,6 +18,8 @@ A collection of Ansible roles for PHP Stuff.
 * Debian based
     - Debian 10 / 11
     - Ubuntu 20.10
+    
+> **RedHat-based systems are no longer officially supported! May work, but does not have to.**
 
 ## Contribution
 
@@ -44,3 +46,15 @@ If you want to use something stable, please use a [Tagged Version](https://githu
 [fpm]: https://github.com/bodsch/ansible-collection-php/actions/workflows/fpm.yml
 [pecl]: https://github.com/bodsch/ansible-collection-php/actions/workflows/pecl.yml
 [composer]: https://github.com/bodsch/ansible-collection-php/actions/workflows/composer.yml
+
+---
+
+## Author
+
+- Bodo Schulz
+
+## License
+
+[Apache](LICENSE)
+
+**FREE SOFTWARE, HELL YEAH!**

@@ -1,0 +1,60 @@
+---
+
+- name: detect available php version
+  bodsch.php.php_version:
+    package_version: "{{ php_version }}"
+  register: detected_php_version
+
+- name: check the detected php version
+  ansible.builtin.fail:
+    msg: "The requested PHP version {{ php_version }} was not found!\nVersion {{ detected_php_version.available.version }} is available."
+  when:
+    - php_version is defined
+    - detected_php_version is defined
+    - detected_php_version.available is defined
+    - not detected_php_version.available | bodsch.php.verify_version(php_version)
+
+- name: "set php_version '{{ detected_php_version.available.version }}'"
+  ansible.builtin.set_fact:
+    php_version: "{{ detected_php_version.available.version }}"
+    php_package_version: "{{ detected_php_version.available.package_version }}"
+    php_major_version: "{{ detected_php_version.available.major_version }}"
+  when:
+    - not detected_php_version.failed
+    - detected_php_version.available is defined
+    - detected_php_version.available.version is defined
+    - detected_php_version.available.package_version is defined
+    - detected_php_version.available.major_version is defined
+
+- name: "unset php_major_version for PHP 8"
+  ansible.builtin.set_fact:
+    php_major_version: ""
+  when:
+    - ansible_distribution | lower == 'archlinux' or
+      ansible_distribution | lower | replace(' ', '') == 'artixlinux'
+    - php_major_version | int == 8
+
+- name: do facts module to get latest information
+  ansible.builtin.setup:
+
+- name: re-include OS specific configuration
+  ansible.builtin.include_vars: "{{ lookup('first_found', params) }}"
+  vars:
+    params:
+      paths:
+        - "vars"
+      files:
+        # eg. debian-10 / ubuntu-20.04 / centos-8 / oraclelinux-8
+        - "{{ ansible_distribution | lower }}-{{ ansible_distribution_major_version }}.yml"
+        # eg. archlinux-systemd / archlinux-openrc
+        - "{{ ansible_distribution | lower }}-{{ ansible_service_mgr | lower }}.yml"
+        # eg. artixlinux
+        - "{{ ansible_distribution | lower | replace(' ', '') }}.yml"
+        # eg. debian / ubuntu / centos / oraclelinux
+        - "{{ ansible_distribution | lower }}.yml"
+        # eg. redhat / debian / archlinux
+        - "{{ ansible_os_family | lower }}.yml"
+        - default.yml
+      skip: true
+
+...

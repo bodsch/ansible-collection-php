@@ -1,0 +1,19 @@
+---
+
+- name: install composer
+  bodsch.php.composer_installer:
+    signature: https://composer.github.io/installer.sig
+    installer: https://getcomposer.org/installer
+    version: "{{ php_composer_version }}"
+    # version_branch: "--2.2"
+    self_update: "{{ php_composer_self_update | bool }}"
+    # path: "{{  }}"
+  register: _composer_installer
+
+- name: create custom fact file
+  bodsch.core.facts:
+    name: composer
+    facts:
+      version: "{{ php_composer_version }}"
+
+...

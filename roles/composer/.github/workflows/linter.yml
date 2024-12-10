@@ -1,0 +1,75 @@
+---
+
+name: code linter
+
+on:
+  schedule:
+    #        ┌───────────── minute (0 - 59)
+    #        │ ┌───────────── hour (0 - 23)
+    #        │ │ ┌───────────── day of the month (1 - 31)
+    #        │ │ │ ┌───────────── month (1 - 12)
+    #        │ │ │ │ ┌───────────── day of the week (0 - 6)
+    #        * * * * *
+    - cron: "1 1 * * 0"
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'
+        required: true
+        default: 'warning'
+        type: choice
+        options:
+          - info
+          - warning
+          - debug
+  push:
+    branches:
+      - 'main'
+      - 'feature/**'
+      - '!doc/**'
+    paths:
+      - "!Makefile"
+      - "!README.md"
+      - "tasks/**"
+      - '.config/pycodestyle.cfg'
+  pull_request:
+    branches:
+      - 'main'
+      - 'feature/**'
+      - '!doc/**'
+    paths:
+      - "!Makefile"
+      - "!README.md"
+      - "tasks/**"
+      - '.config/pycodestyle.cfg'
+
+jobs:
+  pep8:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python_version:
+          - "3.11"
+          - "3.12"
+    steps:
+      - name: Check out the codebase.
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_branch }}
+
+      - name: 🐍 set up python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "${{ matrix.python_version }}"
+
+      - name: Install test dependencies.
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install pycodestyle
+
+      - name: Lint code.
+        run: |
+          pycodestyle --config=.config/pycodestyle.cfg --statistics --count --exclude=test_default.py .
+
+...

@@ -240,4 +240,3 @@ def test_fpm_pools(host, get_vars):
 
         assert host.file(socket_name).exists
         assert host.socket(f"unix://{socket_name}").is_listening
-

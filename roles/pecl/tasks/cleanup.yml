@@ -1,7 +1,7 @@
 ---
 
 - name: clear pecl cache
-  bodsch.php.php_pecl:
+  bodsch.php.pecl:
     state: "clear-cache"
   register: php_pecl_pecl_result
 

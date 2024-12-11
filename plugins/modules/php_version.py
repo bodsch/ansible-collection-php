@@ -130,67 +130,6 @@ class PHPVersion(object):
 
         return False, version, ''
 
-    def _search_yum(self):
-        """
-            yum info php73 | grep Summary | cut -d ':' -f 2 | tr -d '[:space:]' | cut -c23-25
-
-            centos7 provides PHP 5.4(.16) m(
-            we use remi packages for newer version
-            https://blog.remirepo.net/post/2018/12/10/Install-PHP-7.3-on-CentOS-RHEL-or-Fedora
-        """
-        pattern = re.compile(r".*Version.*: (?P<version>\d\.\d)", re.MULTILINE)
-
-        package_version = self.package_version
-
-        if (package_version):
-            package_version = package_version.replace('.', '')
-
-        package_mgr = self.module.get_bin_path('yum', False)
-
-        if (not package_mgr):
-            package_mgr = self.module.get_bin_path('dnf', True)
-
-        if (not package_mgr):
-            return True, "", "no valid package manager (yum or dnf) found"
-
-        self.module.log(msg="  '{0}'".format(package_mgr))
-
-        rc, out, err = self.module.run_command(
-            [package_mgr, "info", f"php{package_version}*common"],
-            check_rc=False)
-
-        version = ''
-
-        if rc == 0:
-            versions = []
-
-            for line in out.splitlines():
-                # self.module.log(msg="line     : {}".format(line))
-                for match in re.finditer(pattern, line):
-                    result = re.search(pattern, line)
-                    versions.append(result.group('version'))
-
-            # self.module.log(msg=f"versions      : '{versions}'")
-
-            if len(versions) == 0:
-                msg = 'nothing found'
-                error = True
-
-            if len(versions) == 1:
-                msg = ''
-                error = False
-                version = versions[0]
-
-            if len(versions) > 1:
-                msg = 'more then one result found! choose one of them!'
-                error = True
-                version = ', '.join(versions)
-        else:
-            msg = 'nothing found'
-            error = True
-
-        return error, version, msg
-
     def _search_pacman(self):
         """
             pacman support

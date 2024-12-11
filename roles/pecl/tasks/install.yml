@@ -29,7 +29,7 @@
 # use "pecl channel-update pecl.php.net"
 
 - name: update pecl channel
-  bodsch.php.php_pecl:
+  bodsch.php.pecl:
     state: "channel-update"
     # packages: "{{ php_pecl_extensions }}"
     # php_config:
@@ -44,7 +44,7 @@
 #     msg: "{{ php_pecl_pecl_result }}"
 
 - name: install pecl extensions
-  bodsch.php.php_pecl:
+  bodsch.php.pecl:
     state: check
     packages: "{{ php_pecl_extensions }}"
     php_config:
@@ -55,7 +55,7 @@
   register: php_pecl_pecl_result
 
 - name: install pecl extensions
-  bodsch.php.php_pecl:
+  bodsch.php.pecl:
     state: install
     packages: "{{ php_pecl_extensions }}"
     php_config:

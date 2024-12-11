@@ -51,7 +51,7 @@
 # # TODO
 # # detect installed pecl extensions and versions
 # - name: check installed pecl extension
-#   bodsch.php.php_pecl:
+#   bodsch.php.pecl:
 #     state: check
 #     packages: "{{ php_pecl_extensions }}"
 #     php_config:

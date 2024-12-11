@@ -43,7 +43,7 @@
 # TODO
 # detect installed pecl extensions and versions
 - name: check installed pecl extension
-  bodsch.php.php_pecl:
+  bodsch.php.pecl:
     state: check
     packages: "{{ php_pecl_extensions }}"
     php_config:
@@ -68,7 +68,7 @@
     - php_pecl_build_dependecies | default([]) | count > 0
 
 - name: update pecl channel
-  bodsch.php.php_pecl:
+  bodsch.php.pecl:
     state: "channel-update"
   register: php_pecl_pecl_result
 
@@ -77,7 +77,7 @@
 #     msg: "{{ php_pecl_pecl_result }}"
 
 # - name: install pecl extensions
-#   bodsch.php.php_pecl:
+#   bodsch.php.pecl:
 #     state: check
 #     packages: "{{ php_pecl_extensions }}"
 #     php_config:
@@ -88,7 +88,7 @@
 #   register: php_pecl_pecl_result
 
 - name: install pecl extensions
-  bodsch.php.php_pecl:
+  bodsch.php.pecl:
     state: install
     packages: "{{ php_pecl_extensions }}"
     php_config:

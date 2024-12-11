@@ -20,55 +20,11 @@
         - default.yml
       skip: true
 
-# - name: assert missing defined composer version
-#   ansible.builtin.assert:
-#     that:
-#       - php_composer_version | int not in ["8"]
-#     msg: php composer version is missing or wrong major version
-#     quiet: true
-
-# - name: debian
-#   when:
-#     - ansible_os_family | lower == 'debian'
-#   block:
-#     - name: make sure python3-apt is installed (only debian based)
-#       ansible.builtin.package:
-#         name:
-#           - python3-apt
-#         state: present
-#
-#     - name: clean apt cache
-#       ansible.builtin.command: |
-#         apt-get clean
-#       register: apt_clean
-#       changed_when: apt_clean.rc != 0
-#       failed_when: apt_clean.rc != 0
-#       when: "ansible_version.full is version_compare('2.13', '<')"
-#
-#     - name: clean apt cache
-#       ansible.builtin.apt:
-#         clean: true
-#       when: "ansible_version.full is version_compare('2.13', '>=')"
-#
-#     - name: update package
-#       ansible.builtin.package:
-#         update_cache: true
-
 - name: install dependencies
   ansible.builtin.package:
     name: "{{ php_composer_dependencies }}"
     state: present
   when:
     - php_composer_dependencies | default([]) | count > 0
-
-# - name: repositories
-#   ansible.builtin.include_tasks: repositories/main.yml
-#
-# - name: do facts module to get latest information
-#   ansible.builtin.setup:
-#     gather_subset:
-#       - '!all'
-#       - '!any'
-#       - facter
 
 ...

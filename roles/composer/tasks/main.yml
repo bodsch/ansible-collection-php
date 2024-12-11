@@ -6,12 +6,6 @@
     - php
     - composer
 
-# - name: detect available php version
-#   ansible.builtin.include_tasks: detect_php_version.yml
-#   tags:
-#     - php
-#     - composer
-
 - name: install
   ansible.builtin.include_tasks: install.yml
   tags:

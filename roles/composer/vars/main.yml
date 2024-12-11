@@ -2,31 +2,4 @@
 
 php_composer_dependencies: []
 
-# php_defaults_packages: []
-#
-# php_conf_paths: []
-#
-# php_extension_conf_paths: []
-#
-# php_composer_path: /usr/local/bin
-# php_composer_keep_updated: false
-#
-# php_composer_version_branch: '--2'
-#
-# # A list of packages to install globally. See commented examples below for
-# # usage; the 'release' is optional, and defaults to '@stable'.
-# php_composer_global_packages: []
-# # - { name: phpunit/phpunit, release: "4.7.x" }
-# # - { name: phpunit/phpunit, release: "@stable" }
-#
-# php_composer_add_to_path: true
-#
-# # Add a project vendor/bin directory to the PATH
-# php_composer_add_project_to_path: false
-# # composer_project_path: /path/to/project/vendor/bin
-#
-# # GitHub OAuth token (used to help overcome API rate limits).
-# php_composer_github_oauth_token: ''
-
-
 ...

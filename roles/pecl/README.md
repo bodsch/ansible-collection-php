@@ -3,8 +3,6 @@
 
 Ansible role to install php pecl packages on various systems.
 
-Detect available PHP Version based on `php_version` Variable.
-
 ## usage
 
 ```yaml

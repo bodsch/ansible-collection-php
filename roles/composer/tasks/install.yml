@@ -1,0 +1,52 @@
+---
+
+- name: ensure composer directory exists.
+  become: true
+  become_user: "{{ composer_home.owner }}"
+  ansible.builtin.file:
+    path: "{{ composer_home.path }}"
+    owner: "{{ composer_home.owner }}"
+    group: "{{ composer_home.group }}"
+    state: directory
+    mode: "0755"
+
+- name: install composer
+  bodsch.php.composer_installer:
+    # signature: https://composer.github.io/installer.sig
+    # installer: https://getcomposer.org/installer
+    version: "{{ composer_version | default('') }}"
+    version_branch: "--2.2"
+    self_update: "{{ composer_self_update | default('false') | bool }}"
+    # path: "{{  }}"
+  register: _composer_installer
+
+- name: install or remove configured globally-required packages
+  become: true
+  become_user: "{{ composer_home.owner }}"
+  environment:
+    COMPOSER_HOME: "{{ composer_home.path }}"
+  bodsch.php.composer_packages:
+    packages: "{{ composer_global_packages | default([]) }}"
+  register: composer_packages
+
+- name: add {{ composer_home.path }} bin directory to global $PATH.
+  ansible.builtin.template:
+    src: etc/profile.d/composer.sh.j2
+    dest: /etc/profile.d/composer.sh
+    mode: "0644"
+  when:
+    - composer_add_to_path | bool
+
+- name: add {{ composer_home.path }} bin directory to global $PATH.
+  ansible.builtin.template:
+    src: etc/profile.d/composer-project.sh.j2
+    dest: /etc/profile.d/composer-project.sh
+    mode: "0644"
+
+- name: create custom fact file
+  bodsch.core.facts:
+    name: composer
+    facts:
+      version: "{{ _composer_installer.version }}"
+
+...

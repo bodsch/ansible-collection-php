@@ -168,9 +168,9 @@ class PhpPecl(object):
             rc, out, err = self.__simple_pecl_command(["channel-update", "pecl.php.net"])
 
             result = dict(
-                changed = False,
-                failed = False,
-                result = out
+                changed=False,
+                failed=False,
+                result=out
             )
 
         elif self.state == "install":
@@ -205,9 +205,9 @@ class PhpPecl(object):
             #     )
 
             result = dict(
-                changed = _changed,
-                failed = _failed,
-                result = result_state
+                changed=_changed,
+                failed=_failed,
+                result=result_state
             )
         elif self.state == "check":
 
@@ -225,19 +225,19 @@ class PhpPecl(object):
             _failed = (len(failed) > 0)
 
             result = dict(
-                changed = _changed,
-                failed = _failed,
-                result = result_state,
-                missing = packages
+                changed=_changed,
+                failed=_failed,
+                result=result_state,
+                missing=packages
             )
 
         else:
             rc, out, err = self.__simple_pecl_command(self.state)
 
             result = dict(
-                changed = False,
-                failed = False,
-                result = out
+                changed=False,
+                failed=False,
+                result=out
             )
 
         return result
@@ -340,7 +340,6 @@ class PhpPecl(object):
 
         rc, out, err = self.__exec(args)
 
-
         package_name = None
         for p in self.packages:
             """
@@ -349,7 +348,7 @@ class PhpPecl(object):
             package_name = p.get("name", None)
             package_state = p.get("state", "present")
             package_priority = p.get("priority", 80)
-            package_enabled  = p.get("enabled", True)
+            package_enabled = p.get("enabled", True)
 
             if package_name:
                 self.module.log(msg=f"- package {package_name} should be {package_state} and {package_enabled}")
@@ -368,8 +367,8 @@ class PhpPecl(object):
                         res[package_name] = self.__install_pecl_package(p)
                     else:
                         res[package_name] = dict(
-                            changed = False,
-                            msg = f"{package_name} is already installed."
+                            changed=False,
+                            msg=f"{package_name} is already installed."
                         )
                 else:
                     res[package_name] = self.__uninstall_pecl_package(p)
@@ -410,33 +409,33 @@ class PhpPecl(object):
 
                 if not _version and not checksum:
                     res[package_name] = dict(
-                        installed = False,
-                        changed = False,
-                        msg = f"{package_name} is not installed.",
+                        installed=False,
+                        changed=False,
+                        msg=f"{package_name} is not installed.",
                     )
 
                 elif _version and not checksum:
                     res[package_name] = dict(
-                        installed = False,
-                        changed = False,
-                        msg = f"{package_name} is not installed.",
+                        installed=False,
+                        changed=False,
+                        msg=f"{package_name} is not installed.",
                     )
 
                 elif not _version and checksum:
                     res[package_name] = dict(
-                        installed = True,
-                        changed = False,
-                        failed = True,
-                        msg = f"{package_name} is already installed, but not via pear."
+                        installed=True,
+                        changed=False,
+                        failed=True,
+                        msg=f"{package_name} is already installed, but not via pear."
                     )
 
                     pac.remove(p)
 
                 else:
                     res[package_name] = dict(
-                        installed = True,
-                        changed = False,
-                        msg = f"{package_name} is already with version {_version} installed."
+                        installed=True,
+                        changed=False,
+                        msg=f"{package_name} is already with version {_version} installed."
                     )
 
                     pac.remove(p)
@@ -512,11 +511,11 @@ class PhpPecl(object):
             )
 
         return dict(
-            rc = rc,
-            args = ' '.join(args),
-            failed = False,
-            changed = True,
-            msg = msg
+            rc=rc,
+            args=' '.join(args),
+            failed=False,
+            changed=True,
+            msg=msg
         )
 
     def __uninstall_pecl_package(self, package):
@@ -551,8 +550,8 @@ class PhpPecl(object):
         self.__disable_pecl_module(package_name, package_priority, checksum_file)
 
         return dict(
-            changed = _changed,
-            msg = _msg
+            changed=_changed,
+            msg=_msg
         )
 
     def __enable_pecl_module(self, package_name, package_priority):
@@ -572,7 +571,7 @@ class PhpPecl(object):
 
             self.__create_link(source=config_file, destination=destination)
 
-    def __disable_pecl_module(self, package_name, package_priority, checksum_file = None):
+    def __disable_pecl_module(self, package_name, package_priority, checksum_file=None):
         """
             create config file and links
         """

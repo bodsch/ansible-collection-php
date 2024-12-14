@@ -1,0 +1,23 @@
+---
+
+php_pecl_extensions:
+  # - name: APCu
+  #   version: 5.1.22
+  #   enabled: false
+
+  # - name: imagick
+  #   version: 3.7.0
+  #   dependencies:
+  #     - libmagickwand-dev
+  #
+  # - name: memcached
+  #   version: 3.2.0
+  #   dependencies:
+  #     - libmemcached-dev
+  #     - libzstd-dev
+  #     - liblz-dev
+
+  - name: redis
+    version: 5.3.7
+
+...

@@ -1,0 +1,27 @@
+---
+
+- name: add php version to various php packages
+  ansible.builtin.set_fact:
+    php_packages: "{{ php_packages | bodsch.php.add_php_version(version=detected_php_version.available, os_family=ansible_os_family) }}"
+
+- name: merge php defaults and custom packages
+  ansible.builtin.set_fact:
+    php_packages: "{{ php_defaults_packages + php_packages | default([]) | ansible.builtin.unique }}"
+
+- name: ensure PHP packages are installed.
+  ansible.builtin.package:
+    name: "{{ php_packages }}"
+    state: "{{ php_packages_state }}"
+  when:
+    - php_packages | default([]) | count > 0
+
+- name: create custom fact file
+  bodsch.core.facts:
+    name: php
+    facts:
+      version:
+        package: "{{ php_package_version }}"
+        major: "{{ php_major_version }}"
+        full: "{{ php_version }}"
+
+...

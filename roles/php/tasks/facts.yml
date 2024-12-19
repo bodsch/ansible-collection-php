@@ -1,0 +1,12 @@
+---
+
+- name: create custom fact file
+  bodsch.core.facts:
+    name: php
+    facts:
+      version:
+        package: "{{ php_package_version }}"
+        major: "{{ php_major_version }}"
+        full: "{{ php_version }}"
+
+...

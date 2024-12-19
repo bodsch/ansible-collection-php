@@ -2,15 +2,8 @@
 
 php_defaults_packages:
   - php{{ php_major_version }}
-  - php{{ php_major_version }}-fpm
-  - php{{ php_major_version }}-fpm-openrc
 
 php_conf_paths:
   - /etc/php{{ php_major_version }}
-
-php_extension_conf_paths:
-  - /etc/php{{ php_major_version }}/conf.d
-
-php_modules_conf_paths: /etc/php{{ php_major_version }}/mods-available
 
 ...

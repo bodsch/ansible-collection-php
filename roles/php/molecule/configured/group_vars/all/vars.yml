@@ -1,31 +1,11 @@
 ---
 
-php_package_version: '73'
-
-# php_custom_packages:
-#   - php-ldap
-#   - php-imap
-
-php_fpm_pools:
-  - name: worker-01
-    user: "{{ php_fpm_pool_user }}"
-    group: "{{ php_fpm_pool_group }}"
-    listen.owner: "{{ php_fpm_pool_user }}"
-    listen.group: "{{ php_fpm_pool_group }}"
-    listen: "/run/php/$pool.sock"
-    # static, dynamic or ondemand
-    pm: dynamic
-    pm.max_children: 10
-    pm.start_servers: 4
-    pm.min_spare_servers: 2
-    pm.max_spare_servers: 6
-
 php_modules:
   - name: opcache
     enabled: true
     priority: 10
     content: |
-      zend_extension=opcache.so
+      zend_extension=opcache
       opcache.enable=1
       opcache.enable_cli=1
       opcache.memory_consumption=128
@@ -40,12 +20,12 @@ php_modules:
     enabled: true
     priority: 20
     content: |
-      extension=pdo_mysql.so
+      extension=pdo_mysql
   - name: apcu
     enabled: false
     priority: 20
     content: |
-      extension=apcu.so
+      extension=apcu
       apc.shm_size=96M
       apc.enable_cli=0
       apc.rfc1867=1
@@ -53,12 +33,28 @@ php_modules:
     enabled: true
     priority: 20
     content: |
-      extension=gd.so
+      extension=gd
   - name: memcached
     enabled: false
     priority: 20
     content: |
-      extension=memcached.so
+      extension=memcached
+  - name: xmlrpc
+    enabled: "{{ 'false' if ansible_os_family | lower == 'archlinux' else 'true' }}"
+    priority: 20
+    content: |
+      extension=xmlrpc
+  - name: sqlite3
+    enabled: false
+    priority: 20
+    content: |
+      extension=sqlite3
+      extension=pdo_sqlite
   - name: pdo_mysql
     enabled: false
     priority: 30
+
+php_packages: []
+  #- php-gd
+  #- php-intl
+  # - php-sqlite

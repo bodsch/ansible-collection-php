@@ -9,6 +9,10 @@ composer_home:
   owner: root
   group: root
 
+composer_add_to_path: true
+
+composer_project: ""
+
 composer_global_packages: []
   # - name: psr/log
   #   state: present

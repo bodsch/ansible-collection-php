@@ -2,6 +2,7 @@
 
 - name: detect available php version
   bodsch.php.php_version:
+    package: php
     package_version: "{{ php_version }}"
   register: detected_php_version
 

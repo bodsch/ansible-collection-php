@@ -30,6 +30,7 @@ class PHPVersion(object):
           Initialize all needed Variables
         """
         self.module = module
+        self.package = module.params.get("package")
         self.package_version = module.params.get("package_version")
 
         (self.distribution, self.version, self.codename) = distro.linux_distribution(
@@ -100,30 +101,32 @@ class PHPVersion(object):
         cache.update()
         cache.open()
 
-        pkg = cache['php']
+        pkg = cache.get(self.package)
 
-        # self.module.log(msg="pkg       : {}".format(pkg))
-        # self.module.log(msg="installed : {}".format(pkg.is_installed))
-        # self.module.log(msg="shortname : {}".format(pkg.shortname))
-        # self.module.log(msg="versions  : {}".format(pkg.versions))
+        # self.module.log(msg=f"pkg            : {pkg}")
+        # self.module.log(msg=f"installed      : {pkg.is_installed}")
+        # self.module.log(msg=f"virtual_package: {cache.is_virtual_package(self.package)}")
+        # self.module.log(msg=f"shortname      : {pkg.shortname}")
+        # self.module.log(msg=f"versions       : {pkg.versions}")
 
-        if (pkg):
+        if pkg:
             pattern = re.compile(r'^\d:(?P<version>[0-9.]+)\+.*')
 
             for pkg_version in pkg.versions:
                 _version = pkg_version.version
-                self.module.log(
-                    msg=f" - version  : {_version} {type(_version)}")
-
+                # self.module.log(
+                #     msg=f" - version  : {_version} {type(_version)}")
                 result = re.search(pattern, _version)
-                version = result.group(1)
+
+                if result:
+                    version = result.group('version')
                 # self.module.log(msg=f" - version  : {version}")
                 if version.startswith(self.package_version):
                     break
                 else:
                     version = ''
 
-        self.module.log(msg=f"version  : {version}")
+        # self.module.log(msg=f"version  : {version}")
 
         if version == '':
             return True, '', f"no php version {self.package_version} found."
@@ -148,7 +151,7 @@ class PHPVersion(object):
         args.append("--noconfirm")
         args.append("--sync")
         args.append("--search")
-        args.append("php")
+        args.append(self.package)
 
         rc, out, err = self._pacman(args)
 
@@ -174,12 +177,11 @@ class PHPVersion(object):
                         v = None
 
                 if v is None and len(versions) == 0:
-                    return True, "", "not found"
+                    return True, "", f"package {self.package} in version {self.package_version} not found."
                 elif v is None and len(versions) != 0:
                     return True, "", f"you want version {self.package_version}, but i found versions {versions}."
                 else:
                     return False, v, ""
-
         else:
             return True, "", "not found"
 
@@ -189,22 +191,28 @@ class PHPVersion(object):
 
         self.module.log(msg=f"cmd: {cmd}")
 
-        rc, out, err = self.module.run_command(cmd, check_rc=True)
+        rc, out, err = self.module.run_command(cmd, check_rc=False)
         # self.module.log(msg="  rc : '{}'".format(rc))
         # self.module.log(msg="  out: '{}' ({})".format(out, type(out)))
         # self.module.log(msg="  err: '{}'".format(err))
         return rc, out, err
 
-# ===========================================
-# Module execution.
-#
-
 
 def main():
-    module = AnsibleModule(
-        argument_spec=dict(
-            package_version=dict(required=False, default=''),
+
+    argument_spec=dict(
+        package=dict(
+            required=False,
+            default="php"
         ),
+        package_version=dict(
+            required=False,
+            default=''
+        ),
+    )
+
+    module = AnsibleModule(
+        argument_spec=argument_spec,
         supports_check_mode=False,
     )
 

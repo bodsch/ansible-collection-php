@@ -3,15 +3,25 @@
 - name: prepare
   ansible.builtin.include_tasks: prepare.yml
   tags:
-    - php
+    - php-common
 
 - name: detect available php version
   ansible.builtin.include_tasks: detect_php_version.yml
   tags:
-    - php
+    - php-common
 
 - name: install
   ansible.builtin.include_tasks: install.yml
+  tags:
+    - php-common
+
+# - name: configure
+#   ansible.builtin.include_tasks: configure/main.yml
+#   tags:
+#     - php
+
+- name: ansible facts
+  ansible.builtin.include_tasks: facts.yml
   tags:
     - php
 

@@ -1,0 +1,7 @@
+---
+
+php_ini: []
+
+php_use_managed_ini: true
+
+...

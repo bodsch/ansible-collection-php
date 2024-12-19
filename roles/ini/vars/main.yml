@@ -1,0 +1,152 @@
+---
+
+php_conf_paths:
+  - /etc/php/{{ installed_php_version.package }}/fpm
+  - /etc/php/{{ installed_php_version.package }}/cli
+
+php_extension_conf_paths:
+  - /etc/php/{{ installed_php_version.package }}/fpm/conf.d
+  - /etc/php/{{ installed_php_version.package }}/cli/conf.d
+
+php_pecl_conf_path: /etc/php/{{ installed_php_version.package }}
+
+php_modules_conf_paths: /etc/php/{{ installed_php_version.package }}/mods-available
+
+php_ini_defaults:
+  - php:
+    user_ini.filename:  ""                            # ".user.ini"
+    user_ini.cache_ttl: ""                            # 300
+    engine: true
+    short_open_tag: false
+    precision: 14
+    output_buffering: 4096
+    output_handler: ""
+    url_rewriter.tags: ""
+    url_rewriter.hosts: ""
+    zlib.output_compression: false
+    zlib.output_compression_level: ""  # -1
+    zlib.output_handler: ""  #
+    implicit_flush: false
+    unserialize_callback_func: ""  #
+    unserialize_max_depth: "" # 4096
+    serialize_precision: -1
+    open_basedir: ""  #
+    disable_functions: ""  #
+    disable_classes: ""  #
+    highlight.string : ""  # #DD0000
+    highlight.comment: ""  # #FF9900
+    highlight.keyword: ""  # #007700
+    highlight.default: ""  # #0000BB
+    highlight.html   : ""  # #000000
+    ignore_user_abort: "" # true
+    realpath_cache_size: "" # 4096k
+    realpath_cache_ttl: "" # 120
+    zend.enable_gc: true
+    zend.multibyte: "" # false
+    zend.script_encoding: ""  #
+    zend.exception_ignore_args: true
+    zend.exception_string_param_max_len: 0
+    expose_php: true
+    max_execution_time: 30
+    max_input_time: 60
+    max_input_nesting_level: "" # 64
+    max_input_vars: "" # 1000
+    max_multipart_body_parts: "" # 1500
+    memory_limit: 128M
+    error_reporting: "E_ALL & ~E_DEPRECATED"
+    display_errors: false
+    display_startup_errors: false
+    log_errors: true
+    ignore_repeated_errors: false
+    ignore_repeated_source: false
+    report_memleaks: true
+    report_zend_debug: "" # 0
+    xmlrpc_errors: "" # 0
+    xmlrpc_error_number: "" # 0
+    html_errors: "" # true
+    docref_root: "" # "/phpmanual/"
+    docref_ext: "" # .html
+    error_prepend_string: "" # "<span style='color: #ff0000'>"
+    error_append_string: "" # "</span>"
+    error_log: "" # syslog
+    syslog.ident: "" # php
+    syslog.facility: "" # user
+    syslog.filter: "" # ascii
+    windows.show_crt_warning: "" # 0
+    arg_separator.output: "" # "&amp;"
+    arg_separator.input: "" # ";&"
+    variables_order: "GPCS"
+    request_order: "GP"
+    register_argc_argv: false
+    auto_globals_jit: true
+    enable_post_data_reading: "" # false
+    post_max_size: 8M
+    auto_prepend_file: ""  #
+    auto_append_file: ""  #
+    default_mimetype: "text/html"
+    default_charset: "UTF-8"
+    internal_encoding: ""  #
+    input_encoding: ""  #
+    output_encoding: ""  #
+    include_path: ""  # ".:/php/includes"
+    include_path: ""  # ".;c:\php\includes"
+    doc_root: ""  #
+    user_dir: ""  #
+    extension_dir: ""  # "./"
+    sys_temp_dir: ""  # "/tmp"
+    enable_dl: Off
+    cgi.force_redirect: ""  # 1
+    cgi.nph: ""  # 1
+    cgi.redirect_status_env: ""  #
+    cgi.fix_pathinfo: ""  #1
+    cgi.discard_path: ""  #1
+    fastcgi.impersonate: ""  # 1
+    fastcgi.logging: ""  # 0
+    cgi.rfc2616_headers: ""  # 0
+    cgi.check_shebang_line: ""  #1
+    file_uploads: On
+    upload_tmp_dir: ""  #
+    upload_max_filesize: 2M
+    max_file_uploads: 20
+    allow_url_fopen: On
+    allow_url_include: Off
+    from: ""  # "john@doe.com"
+    user_agent: ""  # "PHP"
+    default_socket_timeout: 60
+    auto_detect_line_endings: ""  # Off
+    extensions: []
+      # - bz2
+      # - curl
+      # - exif
+      # - ffi
+      # - ftp
+      # - fileinfo
+      # - gd
+      # - gettext
+      # - gmp
+      # - intl
+      # - ldap
+      # - mbstring
+      # - mysqli
+      # - odbc
+      # - openssl
+      # - pdo_firebird
+      # - pdo_mysql
+      # - pdo_odbc
+      # - pdo_pgsql
+      # - pdo_sqlite
+      # - pgsql
+      # - shmop
+      # - snmp
+      # - soap
+      # - sockets
+      # - sodium
+      # - sqlite3
+      # - tidy
+      # - xsl
+      # - zip
+    zend_extension: ""  #opcache
+  - "CLI Server":
+    cli_server.color: true
+
+...

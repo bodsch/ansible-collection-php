@@ -37,17 +37,19 @@ If you want to use something stable, please use a [Tagged Version](https://githu
 
 | Role                                                      | Build State | Description |
 |:--------------------------------------------------------- | :---- | :---- |
+| [bodsch.php.php](./roles/php/README.md)                   | [![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/bodsch/ansible-collection-php/php.yml?branch=main)][php]           | Ansible role to install and configure `php-common`. |
 | [bodsch.php.fpm](./roles/fpm/README.md)                   | [![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/bodsch/ansible-collection-php/fpm.yml?branch=main)][fpm]           | Ansible role to install and configure `fpm`.        |
+| [bodsch.php.ini](./roles/ini/README.md)                   | [![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/bodsch/ansible-collection-php/ini.yml?branch=main)][ini]           | Ansible role to create `php.ini`.                   |
 | [bodsch.php.pecl](./roles/pecl/README.md)                 | [![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/bodsch/ansible-collection-php/pecl.yml?branch=main)][pecl]         | Ansible role to install and configure `pecl`.       |
 | [bodsch.php.composer](./roles/composer/README.md)         | [![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/bodsch/ansible-collection-php/composer.yml?branch=main)][composer] | Ansible role to install and configure `composer`.   |
-| [bodsch.php.php](./roles/php/README.md)                   | [![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/bodsch/ansible-collection-php/php.yml?branch=main)][php]           | Ansible role to install and configure `php-common`. |
 
 
 
+[php]: https://github.com/bodsch/ansible-collection-php/actions/workflows/php.yml
 [fpm]: https://github.com/bodsch/ansible-collection-php/actions/workflows/fpm.yml
+[ini]: https://github.com/bodsch/ansible-collection-php/actions/workflows/ini.yml
 [pecl]: https://github.com/bodsch/ansible-collection-php/actions/workflows/pecl.yml
 [composer]: https://github.com/bodsch/ansible-collection-php/actions/workflows/composer.yml
-[php]: https://github.com/bodsch/ansible-collection-php/actions/workflows/php.yml
 
 ---
 

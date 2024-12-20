@@ -1,0 +1,87 @@
+---
+
+
+php_ini:
+  PHP:
+    engine: true
+    short_open_tag: false
+    output_buffering: 4096
+    memory_limit: 56M
+    error_reporting: "E_ALL & ~E_DEPRECATED"
+    display_errors: true
+    display_startup_errors: true
+    default_charset: "UTF-8"
+    extensions:
+      - bz2
+      - curl
+      # - exif
+      # - ffi
+      # - ftp
+      # - fileinfo
+      # - gd
+      # - gettext
+      # - gmp
+      # - intl
+      # - ldap
+      # - mbstring
+      # - mysqli
+      # - odbc
+      # - openssl
+      # - pdo_firebird
+      # - pdo_mysql
+      # - pdo_odbc
+      # - pdo_pgsql
+      # - pdo_sqlite
+      # - pgsql
+      # - shmop
+      # - snmp
+      # - soap
+      # - sockets
+      # - sodium
+      # - sqlite3
+      # - tidy
+      # - xsl
+      # - zip
+  Date:
+    date.timezone: "Europe/Berlin"
+
+  intl:
+    intl.default_locale: "de"
+    intl.error_level: E_WARNING
+    intl.use_exceptions: 0
+
+  Session:
+    session.save_handler: files
+    session.use_strict_mode: 0
+    session.use_cookies: true
+    session.use_only_cookies: 1
+    session.name: PHPSESSID
+    session.auto_start: 0
+    session.cookie_lifetime: 0
+    session.cookie_path: "/"
+    session.cookie_domain: ""
+    session.cookie_httponly: ""
+    session.cookie_samesite: ""
+    session.serialize_handler: php
+    session.gc_probability: 1
+    session.gc_divisor: 1000
+    session.gc_maxlifetime: 1440
+    session.referer_check:
+    session.cache_limiter: nocache
+    session.cache_expire: 320
+    session.use_trans_sid: 0
+    session.trans_sid_tags: "a=href,area=href,frame=src,form="
+    session.lazy_write: true
+
+  opcache:
+  # ; Determines if Zend OPCache is enabled
+    opcache.enable: true
+  # ; Determines if Zend OPCache is enabled for the CLI version of PHP
+    opcache.enable_cli: true
+
+  curl:
+  # ; A default value for the CURLOPT_CAINFO option. This is required to be an
+  # ; absolute path.
+  # ;curl.cainfo =
+
+...

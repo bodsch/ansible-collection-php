@@ -1,0 +1,11 @@
+---
+
+php_conf_paths:
+  - /etc/php
+
+php_extension_conf_paths:
+  - /etc/php/conf.d
+
+php_modules_conf_paths: /etc/php/mods-available
+
+...

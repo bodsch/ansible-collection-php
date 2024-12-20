@@ -1,0 +1,31 @@
+---
+
+galaxy_info:
+  role_name: ini
+
+  author: Bodo Schulz
+  description: ansible role to configure php
+
+  license: Apache
+  min_ansible_version: "2.10"
+
+  platforms:
+    - name: ArchLinux
+    - name: Debian
+      versions:
+        # 10
+        - buster
+        # 11
+        - bullseye
+    - name: Ubuntu
+      versions:
+        # 20.04
+        - focal
+
+  galaxy_tags:
+    - programing
+    - language
+    - php
+    - web
+
+dependencies: []

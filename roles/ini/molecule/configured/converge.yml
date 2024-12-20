@@ -5,4 +5,4 @@
     NETRC: ''
 
   roles:
-    - role: bodsch.php.pecl
+    - role: bodsch.php.ini

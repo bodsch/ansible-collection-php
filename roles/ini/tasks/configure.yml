@@ -13,9 +13,9 @@
     - ansible_local.php.version is defined
     - ansible_local.php.version | length != 0
 
-- name: d
-  debug:
-    msg: "{{ installed_php_version | default('none')}}"
+# - name: d
+#   debug:
+#     msg: "{{ installed_php_version | default('none')}}"
 
 - name: ensure configuration directories exist
   ansible.builtin.file:

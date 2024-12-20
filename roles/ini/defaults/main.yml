@@ -1,5 +1,7 @@
 ---
 
+php_version: 8
+
 php_ini: []
 
 php_use_managed_ini: true

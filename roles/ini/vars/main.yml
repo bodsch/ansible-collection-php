@@ -1,119 +1,41 @@
 ---
 
-php_conf_paths:
-  - /etc/php/{{ installed_php_version.package }}/fpm
-  - /etc/php/{{ installed_php_version.package }}/cli
-
-php_extension_conf_paths:
-  - /etc/php/{{ installed_php_version.package }}/fpm/conf.d
-  - /etc/php/{{ installed_php_version.package }}/cli/conf.d
-
-php_pecl_conf_path: /etc/php/{{ installed_php_version.package }}
-
-php_modules_conf_paths: /etc/php/{{ installed_php_version.package }}/mods-available
-
 php_ini_defaults:
-  - php:
-    user_ini.filename:  ""                            # ".user.ini"
-    user_ini.cache_ttl: ""                            # 300
-    engine: true
-    short_open_tag: false
-    precision: 14
-    output_buffering: 4096
-    output_handler: ""
-    url_rewriter.tags: ""
-    url_rewriter.hosts: ""
-    zlib.output_compression: false
-    zlib.output_compression_level: ""  # -1
-    zlib.output_handler: ""  #
-    implicit_flush: false
-    unserialize_callback_func: ""  #
-    unserialize_max_depth: "" # 4096
-    serialize_precision: -1
-    open_basedir: ""  #
-    disable_functions: ""  #
-    disable_classes: ""  #
-    highlight.string : ""  # #DD0000
-    highlight.comment: ""  # #FF9900
-    highlight.keyword: ""  # #007700
-    highlight.default: ""  # #0000BB
-    highlight.html   : ""  # #000000
-    ignore_user_abort: "" # true
-    realpath_cache_size: "" # 4096k
-    realpath_cache_ttl: "" # 120
-    zend.enable_gc: true
-    zend.multibyte: "" # false
-    zend.script_encoding: ""  #
-    zend.exception_ignore_args: true
-    zend.exception_string_param_max_len: 0
-    expose_php: true
-    max_execution_time: 30
-    max_input_time: 60
-    max_input_nesting_level: "" # 64
-    max_input_vars: "" # 1000
-    max_multipart_body_parts: "" # 1500
-    memory_limit: 128M
-    error_reporting: "E_ALL & ~E_DEPRECATED"
+  PHP:
+    allow_url_fopen: true
+    allow_url_include: false
+    arg_separator.input: ""                         # ";&"
+    arg_separator.output: ""                        # "&amp;"
+    auto_append_file: ""                            #
+    auto_detect_line_endings: ""                    # false
+    auto_globals_jit: true
+    auto_prepend_file: ""                           #
+    cgi.check_shebang_line: ""                      # 1
+    cgi.discard_path: ""                            # 1
+    cgi.fix_pathinfo: ""                            # 1
+    cgi.force_redirect: ""                          # 1
+    cgi.nph: ""                                     # 1
+    cgi.redirect_status_env: ""                     #
+    cgi.rfc2616_headers: ""                         # 0
+    default_charset: "UTF-8"
+    default_mimetype: "text/html"
+    default_socket_timeout: 60
+    disable_classes: ""                             #
+    disable_functions: ""                           #
     display_errors: false
     display_startup_errors: false
-    log_errors: true
-    ignore_repeated_errors: false
-    ignore_repeated_source: false
-    report_memleaks: true
-    report_zend_debug: "" # 0
-    xmlrpc_errors: "" # 0
-    xmlrpc_error_number: "" # 0
-    html_errors: "" # true
-    docref_root: "" # "/phpmanual/"
-    docref_ext: "" # .html
-    error_prepend_string: "" # "<span style='color: #ff0000'>"
-    error_append_string: "" # "</span>"
-    error_log: "" # syslog
-    syslog.ident: "" # php
-    syslog.facility: "" # user
-    syslog.filter: "" # ascii
-    windows.show_crt_warning: "" # 0
-    arg_separator.output: "" # "&amp;"
-    arg_separator.input: "" # ";&"
-    variables_order: "GPCS"
-    request_order: "GP"
-    register_argc_argv: false
-    auto_globals_jit: true
-    enable_post_data_reading: "" # false
-    post_max_size: 8M
-    auto_prepend_file: ""  #
-    auto_append_file: ""  #
-    default_mimetype: "text/html"
-    default_charset: "UTF-8"
-    internal_encoding: ""  #
-    input_encoding: ""  #
-    output_encoding: ""  #
-    include_path: ""  # ".:/php/includes"
-    include_path: ""  # ".;c:\php\includes"
-    doc_root: ""  #
-    user_dir: ""  #
-    extension_dir: ""  # "./"
-    sys_temp_dir: ""  # "/tmp"
-    enable_dl: Off
-    cgi.force_redirect: ""  # 1
-    cgi.nph: ""  # 1
-    cgi.redirect_status_env: ""  #
-    cgi.fix_pathinfo: ""  #1
-    cgi.discard_path: ""  #1
-    fastcgi.impersonate: ""  # 1
-    fastcgi.logging: ""  # 0
-    cgi.rfc2616_headers: ""  # 0
-    cgi.check_shebang_line: ""  #1
-    file_uploads: On
-    upload_tmp_dir: ""  #
-    upload_max_filesize: 2M
-    max_file_uploads: 20
-    allow_url_fopen: On
-    allow_url_include: Off
-    from: ""  # "john@doe.com"
-    user_agent: ""  # "PHP"
-    default_socket_timeout: 60
-    auto_detect_line_endings: ""  # Off
+    doc_root: ""                                    #
+    docref_ext: ""                                  # .html
+    docref_root: ""                                 # "/phpmanual/"
+    enable_dl: false
+    enable_post_data_reading: ""                    # false
+    engine: true
+    error_append_string: ""                         # "</span>"
+    error_log: ""                                   # syslog
+    error_prepend_string: ""                        # "<span style='color: #ff0000'>"
+    error_reporting: "E_ALL & ~E_DEPRECATED"
+    expose_php: true
+    extension_dir: ""                               # "./"
     extensions: []
       # - bz2
       # - curl
@@ -145,8 +67,497 @@ php_ini_defaults:
       # - tidy
       # - xsl
       # - zip
-    zend_extension: ""  #opcache
-  - "CLI Server":
+    fastcgi.impersonate: ""                         # 1
+    fastcgi.logging: ""                             # 0
+    file_uploads: true
+    from: ""                                        # "john@doe.com"
+    highlight.comment: ""                           # #FF9900
+    highlight.default: ""                           # #0000BB
+    highlight.html   : ""                           # #000000
+    highlight.keyword: ""                           # #007700
+    highlight.string : ""                           # #DD0000
+    html_errors: ""                                 # true
+    ignore_repeated_errors: false
+    ignore_repeated_source: false
+    ignore_user_abort: ""                           # true
+    implicit_flush: false
+    include_path: ""                                # ".:/php/includes"
+    include_path: ""                                # ".;c:\php\includes"
+    input_encoding: ""                              #
+    internal_encoding: ""                           #
+    log_errors: true
+    max_execution_time: 30
+    max_file_uploads: 20
+    max_input_nesting_level: ""                     # 64
+    max_input_time: 60
+    max_input_vars: ""                              # 1000
+    max_multipart_body_parts: ""                    # 1500
+    memory_limit: 128M
+    open_basedir: ""                                #
+    output_buffering: 4096
+    output_encoding: ""                             #
+    output_handler: ""
+    post_max_size: 8M
+    precision: 14
+    realpath_cache_size: ""                         # 4096k
+    realpath_cache_ttl: ""                          # 120
+    register_argc_argv: false
+    report_memleaks: true
+    report_zend_debug: ""                           # 0
+    request_order: "GP"
+    serialize_precision: -1
+    short_open_tag: false
+    sys_temp_dir: ""                                # "/tmp"
+    syslog.facility: ""                             # user
+    syslog.filter: ""                               # ascii
+    syslog.ident: ""                                # php
+    unserialize_callback_func: ""                   #
+    unserialize_max_depth: ""                       # 4096
+    upload_max_filesize: 2M
+    upload_tmp_dir: ""                              #
+    url_rewriter.hosts: ""
+    url_rewriter.tags: ""
+    user_agent: ""                                  # "PHP"
+    user_dir: ""                                    #
+    user_ini.cache_ttl: ""                          # 300
+    user_ini.filename:  ""                          # ".user.ini"
+    variables_order: "GPCS"
+    windows.show_crt_warning: ""                    # 0
+    xmlrpc_error_number: ""                         # 0
+    xmlrpc_errors: ""                               # 0
+    zend.enable_gc: true
+    zend.exception_ignore_args: true
+    zend.exception_string_param_max_len: 0
+    zend.multibyte: ""                              # false
+    zend.script_encoding: ""                        #
+    zlib.output_compression: false
+    zlib.output_compression_level: ""               # -1
+    zlib.output_handler: ""                         #
+    zend_extension: ""                              # opcache
+
+  "CLI Server":
     cli_server.color: true
+
+  Date:
+    # ; Defines the default timezone used by the date functions
+    # ; https://php.net/date.timezone
+    date.timezone: ""
+    # ; https://php.net/date.default-latitude
+    date.default_latitude: ""                       # 31.7667
+    # ; https://php.net/date.default-longitude
+    date.default_longitude: ""                      # 35.2333
+    # ; https://php.net/date.sunrise-zenith
+    date.sunrise_zenith: ""                         # 90.833333
+    # ; https://php.net/date.sunset-zenith
+    date.sunset_zenith: ""                          # 90.833333
+
+  filter:
+    # ; https://php.net/filter.default
+    filter.default: ""                              # unsafe_raw
+    # ; https://php.net/filter.default-flags
+    filter.default_flags: ""                        #
+
+  iconv: {}
+    # ;iconv.input_encoding:
+    # ;iconv.internal_encoding:
+    # ;iconv.output_encoding:
+
+  intl: {}
+    # ;intl.default_locale:
+    # ;intl.error_level: E_WARNING
+    # ;intl.use_exceptions: 0
+
+  sqlite3: {}
+    # ;sqlite3.extension_dir:
+    # ;sqlite3.defensive: 1
+
+  Pcre: {}
+    # ;pcre.backtrack_limit=100000
+    # ;pcre.recursion_limit=100000
+    # ;pcre.jit=1
+
+  Pdo:
+    pdo_odbc.connection_pooling: ""                 # strict [Can be one of "strict", "relaxed" or "off"]
+
+  Pdo_mysql:
+    pdo_mysql.cache_size: 2000
+    pdo_mysql.default_socket: ""
+
+  Phar: {}
+    # ;phar.readonly: true
+    # ;phar.require_hash: true
+    # ;phar.cache_list:
+
+  "mail function":
+    # For Win32 only.
+    # SMTP: localhost
+    # smtp_port: 25
+    # sendmail_from: me@example.com
+    # For Unix only.  You may supply arguments as well (default: "sendmail -t -i").
+    mail.log: ""                                    # syslog
+    sendmail_path: ""
+    # mail.force_extra_parameters: ""
+    mail.add_x_header: false
+    mail.mixed_lf_and_crlf: false
+
+  SQL:
+    sql.safe_mode: false
+
+  ODBC:
+    odbc.allow_persistent: true
+    odbc.check_persistent: true
+    odbc.max_persistent: -1
+    odbc.max_links: -1
+    odbc.defaultlrl: 4096
+    odbc.defaultbinmode: 1
+  # ;odbc.default_db   :  Not yet implemented
+  # ;odbc.default_user :  Not yet implemented
+  # ;odbc.default_pw   :  Not yet implemented
+  # ;odbc.default_cursortype
+
+  # MySQL:
+  #   mysql.allow_local_infile: true
+  #   mysql.allow_persistent: true
+  #   mysql.cache_size: 2000
+  #   mysql.max_persistent: -1
+  #   mysql.max_links: -1
+  #   mysql.default_port: ""
+  #   mysql.default_socket: ""
+  #   mysql.default_host: ""
+  #   mysql.default_user: ""
+  #   mysql.default_password: ""
+  #   mysql.connect_timeout: 60
+  #   mysql.trace_mode: false
+
+  MySQLi:
+    mysqli.max_persistent: -1
+    mysqli.allow_persistent: true
+    mysqli.max_links: -1
+    mysqli.default_port: 3306
+    mysqli.default_socket:
+    mysqli.default_host:
+    mysqli.default_user:
+    mysqli.default_pw:
+    # ;mysqli.allow_local_infile: true
+    # ;mysqli.local_infile_directory:
+    # ;mysqli.rollback_on_cached_plink: false
+
+  mysqlnd:
+    mysqlnd.collect_statistics: true
+    mysqlnd.collect_memory_statistics: false
+    # ;mysqlnd.debug:
+    # ;mysqlnd.log_mask: 0
+    # ;mysqlnd.mempool_default_size: 16000
+    # ;mysqlnd.net_cmd_buffer_size: 2048
+    # ;mysqlnd.net_read_buffer_size: 32768
+    # ;mysqlnd.net_read_timeout: 31536000
+    # ;mysqlnd.sha256_server_public_key:
+
+  PostgreSQL:
+    pgsql.allow_persistent: true
+    pgsql.auto_reset_persistent: false
+    pgsql.max_persistent: -1
+    pgsql.max_links: -1
+    pgsql.ignore_notice: 0
+    pgsql.log_notice: 0
+
+  bcmath:
+    bcmath.scale: 0
+
+  browscap:
+    browscap: ""                                    # extra/browscap.ini
+
+  Session:
+    session.save_handler: files
+    session.use_strict_mode: 0
+    session.use_cookies: 1
+    session.use_only_cookies: 1
+    session.name: PHPSESSID
+    session.auto_start: 0
+    session.cookie_lifetime: 0
+    session.cookie_path: /
+    session.cookie_domain: ""
+    session.cookie_httponly: ""
+    session.cookie_samesite: ""
+    session.serialize_handler: php
+    session.gc_probability: 1
+    session.gc_divisor: 1000
+    session.gc_maxlifetime: 1440
+    session.referer_check: ""
+    session.cache_limiter: nocache
+    session.cache_expire: 180
+    session.use_trans_sid: 0
+    session.trans_sid_tags: "a=href,area=href,frame=src,form="
+    session.cookie_secure: ""
+    session.trans_sid_hosts: ""
+    session.upload_progress.enabled: false
+    session.upload_progress.cleanup: true
+    session.upload_progress.prefix: "upload_progress_"
+    session.upload_progress.name: "PHP_SESSION_UPLOAD_PROGRESS"
+    session.upload_progress.freq:  "1%"
+    session.upload_progress.min_freq: "1"
+    session.lazy_write: true
+
+  Assertion:
+    # ; Switch whether to compile assertions at all (to have no overhead at run-time)
+    # ; -1: Do not compile at all
+    # ;  0: Jump over assertion at run-time
+    # ;  1: Execute assertions
+    zend.assertions: -1                             #  -1: Do not compile at all | 0: Jump over assertion at run-time | 1: Execute assertions
+
+  COM: {}
+    # ; path to a file containing GUIDs, IIDs or filenames of files with TypeLibs
+    # ; https://php.net/com.typelib-file
+    # ;com.typelib_file:
+    # ; allow Distributed-COM calls
+    # ; https://php.net/com.allow-dcom
+    # ;com.allow_dcom: true
+    # ; autoregister constants of a component's typelib on com_load()
+    # ; https://php.net/com.autoregister-typelib
+    # ;com.autoregister_typelib: true
+    # ; register constants casesensitive
+    # ; https://php.net/com.autoregister-casesensitive
+    # ;com.autoregister_casesensitive: false
+    # ; show warnings on duplicate constant registrations
+    # ; https://php.net/com.autoregister-verbose
+    # ;com.autoregister_verbose: true
+    # ; The default character set code-page to use when passing strings to and from COM objects.
+    # ; Default: system ANSI code page
+    # ;com.code_page=
+    # ; The version of the .NET framework to use. The value of the setting are the first three parts
+    # ; of the framework's version number, separated by dots, and prefixed with "v", e.g. "v4.0.30319".
+    # ;com.dotnet_version=
+
+  mbstring: {}
+    # ; language for internal character representation.
+    # ; This affects mb_send_mail() and mbstring.detect_order.
+    # ; https://php.net/mbstring.language
+    # ;mbstring.language: Japanese
+    # ; Use of this INI entry is deprecated, use global internal_encoding instead.
+    # ; internal/script encoding.
+    # ; Some encoding cannot work as internal encoding. (e.g. SJIS, BIG5, ISO-2022-*)
+    # ; If empty, default_charset or internal_encoding or iconv.internal_encoding is used.
+    # ; The precedence is: default_charset < internal_encoding < iconv.internal_encoding
+    # ;mbstring.internal_encoding:
+    # ; Use of this INI entry is deprecated, use global input_encoding instead.
+    # ; http input encoding.
+    # ; mbstring.encoding_translation: true is needed to use this setting.
+    # ; If empty, default_charset or input_encoding or mbstring.input is used.
+    # ; The precedence is: default_charset < input_encoding < mbstring.http_input
+    # ; https://php.net/mbstring.http-input
+    # ;mbstring.http_input:
+    # ; Use of this INI entry is deprecated, use global output_encoding instead.
+    # ; http output encoding.
+    # ; mb_output_handler must be registered as output buffer to function.
+    # ; If empty, default_charset or output_encoding or mbstring.http_output is used.
+    # ; The precedence is: default_charset < output_encoding < mbstring.http_output
+    # ; To use an output encoding conversion, mbstring's output handler must be set
+    # ; otherwise output encoding conversion cannot be performed.
+    # ; https://php.net/mbstring.http-output
+    # ;mbstring.http_output:
+    # ; enable automatic encoding translation according to
+    # ; mbstring.internal_encoding setting. Input chars are
+    # ; converted to internal encoding by setting this to true.
+    # ; Note: Do _not_ use automatic encoding translation for
+    # ;       portable libs/applications.
+    # ; https://php.net/mbstring.encoding-translation
+    # ;mbstring.encoding_translation: false
+    # ; automatic encoding detection order.
+    # ; "auto" detect order is changed according to mbstring.language
+    # ; https://php.net/mbstring.detect-order
+    # ;mbstring.detect_order: auto
+    # ; substitute_character used when character cannot be converted
+    # ; one from another
+    # ; https://php.net/mbstring.substitute-character
+    # ;mbstring.substitute_character: none
+    # ; Enable strict encoding detection.
+    # ;mbstring.strict_detection: false
+    # ; This directive specifies the regex pattern of content types for which mb_output_handler()
+    # ; is activated.
+    # ; Default: mbstring.http_output_conv_mimetypes=^(text/|application/xhtml\+xml)
+    # ;mbstring.http_output_conv_mimetypes=
+    # ; This directive specifies maximum stack depth for mbstring regular expressions. It is similar
+    # ; to the pcre.recursion_limit for PCRE.
+    # ;mbstring.regex_stack_limit=100000
+    # ; This directive specifies maximum retry count for mbstring regular expressions. It is similar
+    # ; to the pcre.backtrack_limit for PCRE.
+    # ;mbstring.regex_retry_limit=1000000
+
+  gd:
+    # ; Tell the jpeg decode to ignore warnings and try to create
+    # ; a gd image. The warning will then be displayed as notices
+    # ; disabled by default
+    # ; https://php.net/gd.jpeg-ignore-warning
+    gd.jpeg_ignore_warning: ""                      # 1
+
+  exif:
+    exif.encode_unicode: ""                         # ISO-8859-15
+    # ; https://php.net/exif.decode-unicode-motorola
+    exif.decode_unicode_motorola: ""                # UCS-2BE
+    # ; https://php.net/exif.decode-unicode-intel
+    exif.decode_unicode_intel: ""                   # UCS-2LE
+    # ; https://php.net/exif.encode-jis
+    exif.encode_jis: ""                             #
+    # ; https://php.net/exif.decode-jis-motorola
+    exif.decode_jis_motorola: ""                    # JIS
+    # ; https://php.net/exif.decode-jis-intel
+    exif.decode_jis_intel: ""                       # JIS
+
+  Tidy:
+    tidy.clean_output: false
+    tidy.default_config: ""                         # /usr/local/lib/php/default.tcfg
+
+  soap: {}
+    # soap.wsdl_cache_enabled: 1
+    # soap.wsdl_cache_dir: "/tmp"
+    # soap.wsdl_cache_ttl: 86400
+    # soap.wsdl_cache_limit: 5
+
+  sysvshm: {}
+    # ; A default size of the shared memory segment
+    # sysvshm.init_mem: 10000
+
+  ldap: {}
+    # ; Sets the maximum number of open links or -1 for unlimited.
+    # ldap.max_links: -1
+
+  dba: {}
+    # dba.default_handler=
+
+  opcache: {}
+    # ; Determines if Zend OPCache is enabled
+    # ;opcache.enable=1
+    # ; Determines if Zend OPCache is enabled for the CLI version of PHP
+    # ;opcache.enable_cli=0
+    # ; The OPcache shared memory storage size.
+    # ;opcache.memory_consumption=128
+    # ; The amount of memory for interned strings in Mbytes.
+    # ;opcache.interned_strings_buffer=8
+    # ; The maximum number of keys (scripts) in the OPcache hash table.
+    # ; truely numbers between 200 and 1000000 are allowed.
+    # ;opcache.max_accelerated_files=10000
+    # ; The maximum percentage of "wasted" memory until a restart is scheduled.
+    # ;opcache.max_wasted_percentage=5
+    # ; When this directive is enabled, the OPcache appends the current working
+    # ; directory to the script key, thus eliminating possible collisions between
+    # ; files with the same name (basename). Disabling the directive improves
+    # ; performance, but may break existing applications.
+    # ;opcache.use_cwd=1
+    # ; When disabled, you must reset the OPcache manually or restart the
+    # ; webserver for changes to the filesystem to take effect.
+    # ;opcache.validate_timestamps=1
+    # ; How often (in seconds) to check file timestamps for changes to the shared
+    # ; memory storage allocation. ("1" means validate once per second, but only
+    # ; once per request. "0" means always validate)
+    # ;opcache.revalidate_freq=2
+    # ; Enables or disables file search in include_path optimization
+    # ;opcache.revalidate_path=0
+    # ; If disabled, all PHPDoc comments are dropped from the code to reduce the
+    # ; size of the optimized code.
+    # ;opcache.save_comments=1
+    # ; If enabled, compilation warnings (including notices and deprecations) will
+    # ; be recorded and replayed each time a file is included. Otherwise, compilation
+    # ; warnings will only be emitted when the file is first cached.
+    # ;opcache.record_warnings=0
+    # ; Allow file existence override (file_exists, etc.) performance feature.
+    # ;opcache.enable_file_override=0
+    # ; A bitmask, where each bit enables or disables the appropriate OPcache
+    # ; passes
+    # ;opcache.optimization_level=0x7FFFBFFF
+    # ;opcache.dups_fix=0
+    # ; The location of the OPcache blacklist file (wildcards allowed).
+    # ; Each OPcache blacklist file is a text file that holds the names of files
+    # ; that should not be accelerated. The file format is to add each filename
+    # ; to a new line. The filename may be a full path or just a file prefix
+    # ; (i.e., /var/www/x  blacklists all the files and directories in /var/www
+    # ; that start with 'x'). Line starting with a ; are ignored (comments).
+    # ;opcache.blacklist_filename=
+    # ; Allows exclusion of large files from being cached. By default all files
+    # ; are cached.
+    # ;opcache.max_file_size=0
+    # ; How long to wait (in seconds) for a scheduled restart to begin if the cache
+    # ; is not being accessed.
+    # ;opcache.force_restart_timeout=180
+    # ; OPcache error_log file name. Empty string assumes "stderr".
+    # ;opcache.error_log=
+    # ; All OPcache errors go to the Web server log.
+    # ; By default, only fatal errors (level 0) or errors (level 1) are logged.
+    # ; You can also enable warnings (level 2), info messages (level 3) or
+    # ; debug messages (level 4).
+    # ;opcache.log_verbosity_level=1
+    # ; Preferred Shared Memory back-end. Leave empty and let the system decide.
+    # ;opcache.preferred_memory_model=
+    # ; Protect the shared memory from unexpected writing during script execution.
+    # ; Useful for internal debugging only.
+    # ;opcache.protect_memory=0
+    # ; Allows calling OPcache API functions only from PHP scripts which path is
+    # ; started from specified string. The default "" means no restriction
+    # ;opcache.restrict_api=
+    # ; Mapping base of shared memory segments (for Windows only). All the PHP
+    # ; processes have to map shared memory into the same address space. This
+    # ; directive allows to manually fix the "Unable to reattach to base address"
+    # ; errors.
+    # ;opcache.mmap_base=
+    # ; Facilitates multiple OPcache instances per user (for Windows only). All PHP
+    # ; processes with the same cache ID and user share an OPcache instance.
+    # ;opcache.cache_id=
+    # ; Enables and sets the second level cache directory.
+    # ; It should improve performance when SHM memory is full, at server restart or
+    # ; SHM reset. The default "" disables file based caching.
+    # ;opcache.file_cache=
+    # ; Enables or disables opcode caching in shared memory.
+    # ;opcache.file_cache_only=0
+    # ; Enables or disables checksum validation when script loaded from file cache.
+    # ;opcache.file_cache_consistency_checks=1
+    # ; Implies opcache.file_cache_only=1 for a certain process that failed to
+    # ; reattach to the shared memory (for Windows only). Explicitly enabled file
+    # ; cache is required.
+    # ;opcache.file_cache_fallback=1
+    # ; Enables or disables copying of PHP code (text segment) into HUGE PAGES.
+    # ; Under certain circumstances (if only a single global PHP process is
+    # ; started from which all others fork), this can increase performance
+    # ; by a tiny amount because TLB misses are reduced.  true the other hand, this
+    # ; delays PHP startup, increases memory usage and degrades performance
+    # ; under memory pressure - use with care.
+    # ; Requires appropriate OS configuration.
+    # ;opcache.huge_code_pages=0
+    # ; Validate cached file permissions.
+    # ;opcache.validate_permission=0
+    # ; Prevent name collisions in chroot'ed environment.
+    # ;opcache.validate_root=0
+    # ; If specified, it produces opcode dumps for debugging different stages of
+    # ; optimizations.
+    # ;opcache.opt_debug_level=0
+    # ; Specifies a PHP script that is going to be compiled and executed at server
+    # ; start-up.
+    # ; https://php.net/opcache.preload
+    # ;opcache.preload=
+    # ; Preloading code as root is not allowed for security reasons. This directive
+    # ; facilitates to let the preloading to be run as another user.
+    # ; https://php.net/opcache.preload_user
+    # ;opcache.preload_user=
+    # ; Prevents caching files that are less than this number of seconds old. It
+    # ; protects from caching of incompletely updated files. In case all file updates
+    # ; on your site are atomic, you may increase performance by setting it to "0".
+    # ;opcache.file_update_protection=2
+    # ; Absolute path used to store shared lockfiles (for *nix only).
+    # ;opcache.lockfile_path=/tmp
+
+  curl: {}
+    # curl.cainfo: ""
+
+  openssl: {}
+    # openssl.cafile: ""
+    # openssl.capath: ""
+
+
+  ffi: {}
+    # ; FFI API restriction. Possible values:
+    # ; "preload" - enabled in CLI scripts and preloaded files (default)
+    # ; "false"   - always disabled
+    # ; "true"    - always enabled
+    # ffi.enable: preload
+    # ffi.preload: ""
+
 
 ...

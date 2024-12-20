@@ -1,0 +1,10 @@
+---
+
+php_defaults_packages:
+  - php-common
+  - php-cli
+
+php_dependencies:
+  - gnupg
+
+...

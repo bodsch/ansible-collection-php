@@ -1,0 +1,11 @@
+---
+
+# choose your version!
+php_version: "8"
+
+php_packages_state: present
+
+php_packages: []
+# OBSOLETE
+# replaced by `php_packages`
+# php_custom_packages: []

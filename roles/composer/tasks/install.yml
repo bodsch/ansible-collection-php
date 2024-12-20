@@ -42,6 +42,8 @@
     src: etc/profile.d/composer-project.sh.j2
     dest: /etc/profile.d/composer-project.sh
     mode: "0644"
+  when:
+    - composer_add_to_project_path | default('false') | bool
 
 - name: create custom fact file
   bodsch.core.facts:

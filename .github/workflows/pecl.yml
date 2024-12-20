@@ -116,7 +116,6 @@ jobs:
           - "3.11"
         scenario:
           - default
-          -
         collection_role:
           - pecl
 

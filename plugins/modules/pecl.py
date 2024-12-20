@@ -321,7 +321,7 @@ class PhpPecl(object):
     def __install(self):
         """
         """
-        self.module.log(msg=f"__install()")
+        # self.module.log(msg="__install()")
 
         result_state = []
 
@@ -385,7 +385,7 @@ class PhpPecl(object):
     def __check(self):
         """
         """
-        self.module.log(msg=f"__check()")
+        # self.module.log(msg=f"__check()")
 
         result_state = []
 

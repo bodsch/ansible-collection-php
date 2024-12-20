@@ -10,8 +10,10 @@ composer_home:
   group: root
 
 composer_add_to_path: true
+composer_add_to_project_path: false
 
-composer_project: ""
+composer_project: {}
+#  path: ""
 
 composer_global_packages: []
   # - name: psr/log

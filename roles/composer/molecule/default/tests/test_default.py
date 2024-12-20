@@ -102,9 +102,16 @@ def get_vars(host):
 
 def local_facts(host):
     """
-        return local fact
+      return local facts
     """
-    return host.ansible("setup").get("ansible_facts").get("ansible_local").get("php")
+    local_fact = host.ansible("setup").get("ansible_facts").get("ansible_local")
+
+    print(f"local_fact     : {local_fact}")
+
+    if local_fact:
+        return local_fact.get("php", {})
+    else:
+        return dict()
 
 
 def test_installed_package(host, get_vars):
@@ -117,14 +124,13 @@ def test_installed_package(host, get_vars):
     print(distribution)
 
     if not distribution == "artix":
-        if distribution in ['redhat', 'ol', 'centos', 'rocky', 'almalinux']:
-            package_version = local_facts(host).get("version").get("package")
-            package = f"php{package_version}-php-common"
-
         if distribution in ['arch', 'artix']:
             package_version = local_facts(host).get("version").get("major")
+
             if package_version == 7:
-                package = f"php{package_version}-common"
+                package = f"php{package_version}"
+            else:
+                package = "php"
 
         p = host.package(package)
         assert p.is_installed
@@ -141,11 +147,6 @@ def test_installed_custom_package(host, get_vars):
         if custom_packages:
             for pkg in custom_packages:
                 package = pkg
-
-                if distribution in ['redhat', 'ol', 'centos', 'rocky', 'almalinux']:
-                    package_version = local_facts(
-                        host).get("version").get("package")
-                    package = f"php{package_version}-{pkg}"
 
                 p = host.package(package)
                 assert p.is_installed
@@ -170,26 +171,27 @@ def test_directories(host, get_vars):
         if package_version == 7:
             directories = [
                 f"/etc/php{package_version}/conf.d",
-                f"/etc/php{package_version}/mods-available",
             ]
         else:
             directories = [
                 "/etc/php/conf.d",
-                "/etc/php/mods-available",
             ]
-
-    if distribution in ['redhat', 'ol', 'centos', 'rocky', 'almalinux']:
-        directories = [
-            f"/etc/php/{package_version}/php.d",
-        ]
 
     print(f"directory: {directories}")
 
     for dirs in directories:
-
         d = host.file(dirs)
+        assert d.is_directory
 
-        if distribution in ['redhat', 'ol', 'centos', 'rocky', 'almalinux']:
-            assert d.exists
-        else:
-            assert d.is_directory
+
+@pytest.mark.parametrize("files", [
+    "/usr/local/bin/composer.phar",
+    "/usr/local/bin/composer",
+    "/root/.cache/composer",
+    "/root/.ansible/composer/composer.sha256",
+    "/root/.ansible/composer/composer-installer.sha384",
+    "/root/.ansible/composer/composer-installer.php",
+])
+def test_files(host, files):
+    f = host.file(files)
+    assert f.exists

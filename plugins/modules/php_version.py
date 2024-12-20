@@ -200,7 +200,7 @@ class PHPVersion(object):
 
 def main():
 
-    argument_spec=dict(
+    argument_spec = dict(
         package=dict(
             required=False,
             default="php"

@@ -1,5 +1,7 @@
 ---
 
-php_composer_dependencies: []
+php_composer_dependencies:
+  - python-urllib3
+  - python-requests
 
 ...

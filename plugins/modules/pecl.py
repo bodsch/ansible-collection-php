@@ -358,6 +358,8 @@ class PhpPecl(object):
 
                 self.module.log(f" - pecl {package_name} : {_name} / {_version} / {checksum}")
 
+                # /usr/bin/pecl install channel://pecl.php.net/xmlrpc-1.0.0RC3 ...
+
                 if package_state == "present":
                     if not checksum:
                         """
@@ -385,17 +387,21 @@ class PhpPecl(object):
     def __check(self):
         """
         """
-        # self.module.log(msg=f"__check()")
+        self.module.log(msg="__check()")
 
         result_state = []
 
         pac = self.packages.copy()
+
+        self.module.log(msg=f" packages: {pac}")
 
         package_name = None
         for p in self.packages:
             """
             """
             res = {}
+            self.module.log(msg=f"  - {p}")
+
             package_name = p.get("name", None)
             package_state = p.get("state", "present")
 

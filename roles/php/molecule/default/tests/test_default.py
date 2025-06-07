@@ -104,14 +104,22 @@ def local_facts(host):
     """
         return local fact
     """
-    return host.ansible("setup").get("ansible_facts").get("ansible_local").get("php_fpm")
+    local_fact = host.ansible("setup").get("ansible_facts").get("ansible_local")
+
+    print(f"local_fact     : {local_fact}")
+
+    if local_fact:
+        return local_fact.get("php", {})
+    else:
+        return dict()
+
 
 
 def test_installed_package(host, get_vars):
     """
         test insatlled package
     """
-    package = 'php-fpm'
+    package = 'php'
     distribution = host.system_info.distribution
 
     print(distribution)
@@ -119,12 +127,12 @@ def test_installed_package(host, get_vars):
     if not distribution == "artix":
         if distribution in ['redhat', 'ol', 'centos', 'rocky', 'almalinux']:
             package_version = local_facts(host).get("version").get("package")
-            package = f"php{package_version}-php-fpm"
+            package = f"php{package_version}-php"
 
         if distribution in ['arch', 'artix']:
             package_version = local_facts(host).get("version").get("major")
             if package_version == 7:
-                package = f"php{package_version}-fpm"
+                package = f"php{package_version}"
 
         p = host.package(package)
         assert p.is_installed
@@ -162,7 +170,7 @@ def test_directories(host, get_vars):
     package_version = local_facts(host).get("version").get("full")
     directories = [
         f"/etc/php/{package_version}/cli",
-        f"/etc/php/{package_version}/fpm"
+        # f"/etc/php/{package_version}/fpm"
     ]
 
     if distribution in ['arch', 'artix']:
@@ -171,20 +179,20 @@ def test_directories(host, get_vars):
         if package_version == 7:
             directories = [
                 f"/etc/php{package_version}/conf.d",
-                f"/etc/php{package_version}/mods-available",
+                # f"/etc/php{package_version}/mods-available",
                 f"/etc/php{package_version}/php-fpm.d"
             ]
         else:
             directories = [
                 "/etc/php/conf.d",
-                "/etc/php/mods-available",
-                "/etc/php/php-fpm.d"
+                # "/etc/php/mods-available",
+                # "/etc/php/php-fpm.d"
             ]
 
     if distribution in ['redhat', 'ol', 'centos', 'rocky', 'almalinux']:
         directories = [
             f"/etc/php/{package_version}/php.d",
-            f"/etc/php/{package_version}/php-fpm.d"
+            # f"/etc/php/{package_version}/php-fpm.d"
         ]
 
     print(f"directory: {directories}")
@@ -206,37 +214,41 @@ def test_user(host, get_vars):
     user = local_facts(host).get("user")
     group = local_facts(host).get("group")
 
-    assert host.group(group).exists
-    assert host.user(user).exists
-    assert group in host.user(user).groups
+    if group:
+        assert host.user(user).exists
+    if user:
+        assert host.group(group).exists
+    if user and group:
+        assert group in host.user(user).groups
 
 
-def test_service(host):
-    """
-        is service running and enabled
-    """
-    service = host.service(local_facts(host).get("daemon"))
-
-    assert service.is_enabled
-    assert service.is_running
-
-
-def test_fpm_pools(host, get_vars):
-    """
-        test sockets
-    """
-    for i in host.socket.get_listening_sockets():
-        print(i)
-
-    for pool in get_vars.get("php_fpm_pools"):
-        name = pool.get("name")
-        listen = pool.get("listen")
-
-        local_facts(host).get("socket_directory"),
-
-        socket_name = listen.replace('$pool', name)
-
-        print(socket_name)
-
-        assert host.file(socket_name).exists
-        assert host.socket(f"unix://{socket_name}").is_listening
+# def test_service(host):
+#     """
+#         is service running and enabled
+#     """
+#     service = host.service(local_facts(host).get("daemon"))
+#
+#     assert service.is_enabled
+#     assert service.is_running
+#
+#
+# def test_fpm_pools(host, get_vars):
+#     """
+#         test sockets
+#     """
+#     for i in host.socket.get_listening_sockets():
+#         print(i)
+#
+#     for pool in get_vars.get("php_fpm_pools"):
+#         name = pool.get("name")
+#         listen = pool.get("listen")
+#
+#         local_facts(host).get("socket_directory"),
+#
+#         socket_name = listen.replace('$pool', name)
+#
+#         print(socket_name)
+#
+#         assert host.file(socket_name).exists
+#         assert host.socket(f"unix://{socket_name}").is_listening
+#

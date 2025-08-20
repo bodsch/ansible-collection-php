@@ -230,6 +230,15 @@ class PhpPecl(object):
                 result=result_state,
                 missing=packages
             )
+        elif self.state == "clear-cache":
+
+            rc, out, err = self.__clear_cache()
+
+            result = dict(
+                changed=False,
+                failed=False,
+                result=out
+            )
 
         else:
             rc, out, err = self.__simple_pecl_command(self.state)
@@ -452,6 +461,13 @@ class PhpPecl(object):
 
         return result_state, pac
 
+    def __clear_cache(self):
+        """
+        """
+        _, out, err = self.__simple_pecl_command("clear-cache")
+
+        return (0, out.strip(), err.strip())
+
     def __check_pecl_package(self, package):
         """
         """
@@ -627,14 +643,14 @@ class PhpPecl(object):
             if not os.path.islink(destination):
                 os.symlink(source, destination)
 
-    def __exec(self, commands, check_rc=True):
+    def __exec(self, commands, check_rc=False):
         """
           execute shell program
         """
         rc, out, err = self.module.run_command(commands, check_rc=check_rc)
 
+        self.module.log(msg=f"  rc : '{rc}'")
         if rc != 0:
-            self.module.log(msg=f"  rc : '{rc}'")
             self.module.log(msg=f"  out: '{out}'")
             self.module.log(msg=f"  err: '{err}'")
 
@@ -684,8 +700,8 @@ def main():
     module.log(msg=f"packages   : {packages}")
     module.log(msg=f"php_config : {php_config}")
 
-    if state in ["install", "check"] and len(packages) == 0:
-        module.fail_json(msg="install or check state requires packages")
+    # if state in ["install", "check"] and len(packages) == 0:
+    #     module.fail_json(msg="install or check state requires packages")
 
     api = PhpPecl(module)
     result = api.run()

@@ -3,11 +3,11 @@
 # READ local_facts
 - name: set local fact for container
   ansible.builtin.set_fact:
-    installed_php_version: "{{ ansible_local.php_fpm.version }}"
+    installed_php_version: "{{ ansible_local.php.version }}"
   when:
-    - ansible_local.php_fpm is defined
-    - ansible_local.php_fpm.version is defined
-    - ansible_local.php_fpm.version | length != 0
+    - ansible_local.php is defined
+    - ansible_local.php.version is defined
+    - ansible_local.php.version | length != 0
   tags:
     - php_pecl_install
 

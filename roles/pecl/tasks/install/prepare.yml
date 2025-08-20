@@ -13,7 +13,7 @@
   when:
     - ansible_os_family | lower == "archlinux"
   block:
-    - name: "[archlinux] install build tools"
+    - name: "archlinux : install build tools"
       ansible.builtin.package:
         name:
           - base-devel

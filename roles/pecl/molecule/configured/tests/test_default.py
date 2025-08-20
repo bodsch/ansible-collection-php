@@ -104,7 +104,21 @@ def local_facts(host):
     """
         return local fact
     """
-    return host.ansible("setup").get("ansible_facts").get("ansible_local").get("php_fpm")
+    ansible_facts = host.ansible("setup").get("ansible_facts", {})
+
+    return ansible_facts.get("pecl", {})
+
+
+def test_user(host, get_vars):
+    """
+        test service user and group
+    """
+    user = local_facts(host).get("user")
+    group = local_facts(host).get("group")
+
+    assert host.group(group).exists
+    assert host.user(user).exists
+    assert group in host.user(user).groups
 
 
 def test_installed_package(host, get_vars):
@@ -116,16 +130,12 @@ def test_installed_package(host, get_vars):
 
     print(distribution)
 
-    if distribution in ['redhat', 'ol', 'centos', 'rocky', 'almalinux']:
-        package_version = local_facts(host).get("version").get("package")
-        package = f"php{package_version}-php-fpm"
-
-    if distribution == 'arch':
-        package_version = local_facts(host).get("version").get("major")
-        if package_version == 7:
-            package = f"php{package_version}-fpm"
-        else:
-            package = "php-fpm"
+#     if distribution == 'arch':
+#         package_version = local_facts(host).get("version").get("major")
+#         if package_version == 7:
+#             package = f"php{package_version}-fpm"
+#         else:
+    package = "php"
 
     p = host.package(package)
     assert p.is_installed
@@ -161,8 +171,7 @@ def test_directories(host, get_vars):
 
     package_version = local_facts(host).get("version").get("full")
     directories = [
-        f"/etc/php/{package_version}/cli",
-        f"/etc/php/{package_version}/fpm"
+        "/var/cache/ansible/php_pecl/",
     ]
 
     if distribution == 'arch':
@@ -199,44 +208,17 @@ def test_directories(host, get_vars):
             assert d.is_directory
 
 
-def test_user(host, get_vars):
-    """
-        test service user and group
-    """
-    user = local_facts(host).get("user")
-    group = local_facts(host).get("group")
+def test_files(host, get_vars):
+    """ """
+    files = [
+        "/usr/bin/pecl",
+        "/usr/share/pear/peclcmd.php"
+    ]
 
-    assert host.group(group).exists
-    assert host.user(user).exists
-    assert group in host.user(user).groups
-
-
-def test_service(host):
-    """
-        is service running and enabled
-    """
-    service = host.service(local_facts(host).get("daemon"))
-
-    assert service.is_enabled
-    assert service.is_running
+    for _file in files:
+        f = host.file(_file)
+        assert f.is_file
 
 
-def test_fpm_pools(host, get_vars):
-    """
-        test sockets
-    """
-    for i in host.socket.get_listening_sockets():
-        print(i)
 
-    for pool in get_vars.get("php_fpm_pools"):
-        name = pool.get("name")
-        listen = pool.get("listen")
 
-        local_facts(host).get("socket_directory"),
-
-        socket_name = listen.replace('$pool', name)
-
-        print(socket_name)
-
-        assert host.file(socket_name).exists
-        assert host.socket(f"unix://{socket_name}").is_listening

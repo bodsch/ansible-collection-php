@@ -181,22 +181,11 @@ def test_directories(host, get_vars):
                 "/etc/php/php-fpm.d"
             ]
 
-    if distribution in ['redhat', 'ol', 'centos', 'rocky', 'almalinux']:
-        directories = [
-            f"/etc/php/{package_version}/php.d",
-            f"/etc/php/{package_version}/php-fpm.d"
-        ]
-
     print(f"directory: {directories}")
 
     for dirs in directories:
-
         d = host.file(dirs)
-
-        if distribution in ['redhat', 'ol', 'centos', 'rocky', 'almalinux']:
-            assert d.exists
-        else:
-            assert d.is_directory
+        assert d.is_directory
 
 
 def test_user(host, get_vars):

@@ -68,8 +68,6 @@ def get_vars(host):
 
     if distribution in ['debian', 'ubuntu']:
         operation_system = "debian"
-    elif distribution in ['redhat', 'ol', 'centos', 'rocky', 'almalinux']:
-        operation_system = "redhat"
     elif distribution in ['arch', 'artix']:
         operation_system = f"{distribution}linux"
 
@@ -100,16 +98,169 @@ def get_vars(host):
     return result
 
 
+def local_facts(host):
+    """
+        return local fact
+    """
+    local_fact = host.ansible("setup").get("ansible_facts").get("ansible_local")
+
+    print(f"local_fact     : {local_fact}")
+
+    if local_fact:
+        return local_fact.get("php", {})
+    else:
+        return dict()
+
+
+def test_user(host, get_vars):
+    """
+        test service user and group
+    """
+    user = local_facts(host).get("user")
+    group = local_facts(host).get("group")
+
+    if group:
+        assert host.user(user).exists
+    if user:
+        assert host.group(group).exists
+    if user and group:
+        assert group in host.user(user).groups
+
+
+def test_installed_package(host, get_vars):
+    """
+        test insatlled package
+    """
+    package = 'php-cli'
+    distribution = host.system_info.distribution
+
+    print(distribution)
+
+    if not distribution == "artix":
+        if distribution == "arch":
+            package_version = local_facts(host).get("version").get("major")
+            if package_version == 7:
+                package = f"php{package_version}"
+            else:
+                package = "php"
+
+        p = host.package(package)
+        assert p.is_installed
+
+
+# def test_installed_custom_package(host, get_vars):
+#     """
+#         custom packages
+#     """
+#     custom_packages = get_vars.get("php_packages")
+#     distribution = host.system_info.distribution
+#
+#     if not distribution == "artix":
+#         if custom_packages:
+#             for pkg in custom_packages:
+#                 package = pkg
+#
+#                 p = host.package(package)
+#                 assert p.is_installed
+
+
 def test_directories(host, get_vars):
     """
         test created directories
     """
+    distribution = host.system_info.distribution
+
+    print(distribution)
+
+    package_version = local_facts(host).get("version").get("full")
     directories = [
-        "/etc/php/conf.d",
+        f"/etc/php/{package_version}/cli",
     ]
+
+    if distribution in ['arch', 'artix']:
+        package_version = local_facts(host).get("version").get("major")
+
+        if package_version == 7:
+            directories = [
+                f"/etc/php{package_version}/conf.d",
+            ]
+        else:
+            directories = [
+                "/etc/php/conf.d",
+            ]
 
     print(f"directory: {directories}")
 
     for dirs in directories:
+
         d = host.file(dirs)
         assert d.is_directory
+
+
+def test_ini_files(host, get_vars):
+    """
+    """
+    distribution = host.system_info.distribution
+    release = host.system_info.release
+
+    print(f"distribution: {distribution}")
+    print(f"release     : {release}")
+
+    package_version = local_facts(host).get("version").get("full")
+
+    directories = [
+        f"/etc/php/{package_version}/cli",
+        f"/etc/php/{package_version}/fpm",
+    ]
+
+    if distribution in ['arch', 'artix']:
+        package_version = local_facts(host).get("version").get("major")
+
+        directories = [
+            "/etc/php",
+        ]
+
+    print(f"directory: {directories}")
+
+    for dirs in directories:
+        files = []
+        files.append(f"{dirs}/php.ini")
+
+    print(files)
+
+    for _file in files:
+        f = host.file(_file)
+        assert f.is_file
+
+
+# def test_mods_files(host, get_vars):
+#     """
+#     """
+#     distribution = host.system_info.distribution
+#     release = host.system_info.release
+#
+#     print(f"distribution: {distribution}")
+#     print(f"release     : {release}")
+#
+#     package_version = local_facts(host).get("version").get("full")
+#
+#     directory = f"/etc/php/{package_version}/mods-available"
+#
+#     if distribution in ['arch', 'artix']:
+#         # package_version = local_facts(host).get("version").get("major")
+#         directory = "/etc/php/mods-available"
+#
+#     print(f"directory: {directory}")
+#
+#     files = []
+#     mod_files = ["calendar.ini","exif.ini","sockets.ini"]
+#
+#     for f in mod_files:
+#         files.append(f"{directory}/{f}")
+#
+#     print(files)
+#
+#     for _file in files:
+#         f = host.file(_file)
+#         assert f.is_file
+#

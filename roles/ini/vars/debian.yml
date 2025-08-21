@@ -1,3 +1,11 @@
 ---
 
+php_conf_paths:
+  - /etc/php/{{ php_version }}/fpm
+  - /etc/php/{{ php_version }}/cli
+
+php_extension_conf_paths:
+  - /etc/php/{{ php_version }}/fpm/conf.d
+  - /etc/php/{{ php_version }}/cli/conf.d
+
 ...

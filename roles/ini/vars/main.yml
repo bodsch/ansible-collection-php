@@ -1,5 +1,11 @@
 ---
 
+php_defaults_packages: []
+
+php_dependencies: []
+
+php_conf_paths: []
+
 php_ini_defaults:
   PHP:
     allow_url_fopen: true
@@ -558,6 +564,5 @@ php_ini_defaults:
     # ; "true"    - always enabled
     # ffi.enable: preload
     # ffi.preload: ""
-
 
 ...

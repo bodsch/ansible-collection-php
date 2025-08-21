@@ -68,8 +68,6 @@ def get_vars(host):
 
     if distribution in ['debian', 'ubuntu']:
         operation_system = "debian"
-    elif distribution in ['redhat', 'ol', 'centos', 'rocky', 'almalinux']:
-        operation_system = "redhat"
     elif distribution in ['arch', 'artix']:
         operation_system = f"{distribution}linux"
 
@@ -119,20 +117,18 @@ def test_installed_package(host, get_vars):
     """
         test insatlled package
     """
-    package = 'php'
+    package = 'php-cli'
     distribution = host.system_info.distribution
 
     print(distribution)
 
     if not distribution == "artix":
-        if distribution in ['redhat', 'ol', 'centos', 'rocky', 'almalinux']:
-            package_version = local_facts(host).get("version").get("package")
-            package = f"php{package_version}-php"
-
-        if distribution in ['arch', 'artix']:
+        if distribution == "arch":
             package_version = local_facts(host).get("version").get("major")
             if package_version == 7:
                 package = f"php{package_version}"
+            else:
+                package = "php"
 
         p = host.package(package)
         assert p.is_installed
@@ -150,11 +146,6 @@ def test_installed_custom_package(host, get_vars):
             for pkg in custom_packages:
                 package = pkg
 
-                if distribution in ['redhat', 'ol', 'centos', 'rocky', 'almalinux']:
-                    package_version = local_facts(
-                        host).get("version").get("package")
-                    package = f"php{package_version}-{pkg}"
-
                 p = host.package(package)
                 assert p.is_installed
 
@@ -170,7 +161,6 @@ def test_directories(host, get_vars):
     package_version = local_facts(host).get("version").get("full")
     directories = [
         f"/etc/php/{package_version}/cli",
-        # f"/etc/php/{package_version}/fpm"
     ]
 
     if distribution in ['arch', 'artix']:
@@ -179,32 +169,18 @@ def test_directories(host, get_vars):
         if package_version == 7:
             directories = [
                 f"/etc/php{package_version}/conf.d",
-                # f"/etc/php{package_version}/mods-available",
-                f"/etc/php{package_version}/php-fpm.d"
             ]
         else:
             directories = [
                 "/etc/php/conf.d",
-                # "/etc/php/mods-available",
-                # "/etc/php/php-fpm.d"
             ]
-
-    if distribution in ['redhat', 'ol', 'centos', 'rocky', 'almalinux']:
-        directories = [
-            f"/etc/php/{package_version}/php.d",
-            # f"/etc/php/{package_version}/php-fpm.d"
-        ]
 
     print(f"directory: {directories}")
 
     for dirs in directories:
 
         d = host.file(dirs)
-
-        if distribution in ['redhat', 'ol', 'centos', 'rocky', 'almalinux']:
-            assert d.exists
-        else:
-            assert d.is_directory
+        assert d.is_directory
 
 
 def test_user(host, get_vars):
@@ -220,35 +196,3 @@ def test_user(host, get_vars):
         assert host.group(group).exists
     if user and group:
         assert group in host.user(user).groups
-
-
-# def test_service(host):
-#     """
-#         is service running and enabled
-#     """
-#     service = host.service(local_facts(host).get("daemon"))
-#
-#     assert service.is_enabled
-#     assert service.is_running
-#
-#
-# def test_fpm_pools(host, get_vars):
-#     """
-#         test sockets
-#     """
-#     for i in host.socket.get_listening_sockets():
-#         print(i)
-#
-#     for pool in get_vars.get("php_fpm_pools"):
-#         name = pool.get("name")
-#         listen = pool.get("listen")
-#
-#         local_facts(host).get("socket_directory"),
-#
-#         socket_name = listen.replace('$pool', name)
-#
-#         print(socket_name)
-#
-#         assert host.file(socket_name).exists
-#         assert host.socket(f"unix://{socket_name}").is_listening
-#

@@ -68,8 +68,6 @@ def get_vars(host):
 
     if distribution in ['debian', 'ubuntu']:
         operation_system = "debian"
-    elif distribution in ['redhat', 'ol', 'centos', 'rocky', 'almalinux']:
-        operation_system = "redhat"
     elif distribution in ['arch', 'artix']:
         operation_system = f"{distribution}linux"
 
@@ -102,7 +100,7 @@ def get_vars(host):
 
 def local_facts(host):
     """
-      return local facts
+        return local fact
     """
     local_fact = host.ansible("setup").get("ansible_facts").get("ansible_local")
 
@@ -114,19 +112,19 @@ def local_facts(host):
         return dict()
 
 
+
 def test_installed_package(host, get_vars):
     """
         test insatlled package
     """
-    package = 'php-common'
+    package = 'php-cli'
     distribution = host.system_info.distribution
 
     print(distribution)
 
     if not distribution == "artix":
-        if distribution in ['arch', 'artix']:
+        if distribution == "arch":
             package_version = local_facts(host).get("version").get("major")
-
             if package_version == 7:
                 package = f"php{package_version}"
             else:
@@ -180,5 +178,21 @@ def test_directories(host, get_vars):
     print(f"directory: {directories}")
 
     for dirs in directories:
+
         d = host.file(dirs)
         assert d.is_directory
+
+
+def test_user(host, get_vars):
+    """
+        test service user and group
+    """
+    user = local_facts(host).get("user")
+    group = local_facts(host).get("group")
+
+    if group:
+        assert host.user(user).exists
+    if user:
+        assert host.group(group).exists
+    if user and group:
+        assert group in host.user(user).groups

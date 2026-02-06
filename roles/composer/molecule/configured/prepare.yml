@@ -56,6 +56,11 @@
       tags:
         - always
 
+- name: prepare php
+  hosts: instance
+  any_errors_fatal: false
+  become: false
+
   roles:
     - role: bodsch.php.php
 

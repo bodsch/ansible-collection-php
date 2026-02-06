@@ -16,6 +16,7 @@ php_pecl_extensions:
       - libmemcached-dev
       - libzstd-dev
       - liblz-dev
+      - libzlcore-dev
 
   - name: redis
     version: 5.3.7

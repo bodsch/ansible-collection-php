@@ -2,7 +2,9 @@
 
 - name: find php binaries
   ansible.builtin.find:
-    paths: "/usr/bin"
+    paths:
+      - "/usr/bin"
+      - "/usr/sbin"
     file_type: file
     patterns:
       - "php-fpm*"

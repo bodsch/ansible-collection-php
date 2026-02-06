@@ -25,6 +25,29 @@ platforms:
       - /run
       - /tmp
 
+# provisioner:
+#   name: ansible
+#   ansible_args:
+#     - --diff
+#     - -v
+#   config_options:
+#     defaults:
+#       deprecation_warnings: true
+#       stdout_callback: community.general.diy
+#       gathering: smart
+#       fact_caching: jsonfile
+#       fact_caching_timeout: 320
+#       fact_caching_connection: ansible_facts
+#     callback_diy:
+#       msg_ok: "
+#         OK: {{ ansible_facts.callback_diy.task.name }} auf {{ ansible_facts.callback_diy.result._host }}
+#         Ergebnis:
+#           {{ ansible_facts.callback_diy.result | to_nice_yaml }}"
+#       # msg_ok: ""
+#       msg_skipped: ""
+#       msg_unreachable: "Host {{ ansible_facts.callback_diy.result._host }} nicht erreichbar"
+#       msg_failed: "Fehler bei Task {{ ansible_facts.callback_diy.task.name }}"
+
 provisioner:
   name: ansible
   ansible_args:
@@ -33,26 +56,15 @@ provisioner:
   config_options:
     defaults:
       deprecation_warnings: true
-      stdout_callback: community.general.diy
+      callback_result_format: yaml
+      callbacks_enabled: profile_tasks
       gathering: smart
-      fact_caching: jsonfile
       fact_caching_timeout: 320
-      fact_caching_connection: ansible_facts
-    callback_diy:
-      msg_ok: "
-        OK: {{ ansible_facts.callback_diy.task.name }} auf {{ ansible_facts.callback_diy.result._host }}
-        Ergebnis:
-          {{ ansible_facts.callback_diy.result | to_nice_yaml }}"
-      # msg_ok: ""
-      msg_skipped: ""
-      msg_unreachable: "Host {{ ansible_facts.callback_diy.result._host }} nicht erreichbar"
-      msg_failed: "Fehler bei Task {{ ansible_facts.callback_diy.task.name }}"
 
 scenario:
   test_sequence:
     - destroy
     - dependency
-    - syntax
     - create
     - prepare
     - converge

@@ -43,7 +43,7 @@
 #   debug:
 #     msg: "{{ php_pecl_pecl_result }}"
 
-- name: install pecl extensions
+- name: check pecl extensions
   bodsch.php.pecl:
     state: check
     packages: "{{ php_pecl_extensions }}"

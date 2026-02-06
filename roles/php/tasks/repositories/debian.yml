@@ -1,5 +1,12 @@
 ---
 
+- name: install dependencies
+  ansible.builtin.package:
+    name: "{{ php_dependencies }}"
+    state: present
+  when:
+    - php_dependencies | default([]) | count > 0
+
 - name: debian based
   become: true
   when:

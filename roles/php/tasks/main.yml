@@ -5,6 +5,11 @@
   tags:
     - php-common
 
+- name: repositories
+  ansible.builtin.include_tasks: repositories/main.yml
+  when:
+    - ansible_facts.os_family | lower == 'debian'
+
 - name: detect available php version
   ansible.builtin.include_tasks: detect_php_version.yml
   tags:

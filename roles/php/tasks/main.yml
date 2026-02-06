@@ -15,14 +15,9 @@
   tags:
     - php-common
 
-# - name: configure
-#   ansible.builtin.include_tasks: configure/main.yml
-#   tags:
-#     - php
-
 - name: ansible facts
   ansible.builtin.include_tasks: facts.yml
   tags:
-    - php
+    - php-common
 
 ...

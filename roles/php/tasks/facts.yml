@@ -1,22 +1,32 @@
 ---
 
 - name: detect available php version
-  bodsch.php.php_version:
-    package: php
+  bodsch.core.package_version:
+    package_name: "{{ php_package_name | default('php') }}"
     package_version: "{{ php_version }}"
   register: detected_php_version
 
-- name: "set php_version '{{ detected_php_version.available.version }}'"
+- name: "set php_version '{{ detected_php_version.available.platform_version }}'"
   ansible.builtin.set_fact:
-    php_version: "{{ detected_php_version.available.version }}"
-    php_package_version: "{{ detected_php_version.available.package_version }}"
+    php_version: "{{ detected_php_version.available.full_version }}"
+    php_package_version: "{{ detected_php_version.available.platform_version }}"
     php_major_version: "{{ detected_php_version.available.major_version }}"
   when:
     - not detected_php_version.failed
     - detected_php_version.available is defined
-    - detected_php_version.available.version is defined
-    - detected_php_version.available.package_version is defined
+    - detected_php_version.available.full_version is defined
+    - detected_php_version.available.platform_version is defined
     - detected_php_version.available.major_version is defined
+
+- name: find php binaries
+  ansible.builtin.find:
+    paths: "/usr/bin"
+    file_type: file
+    patterns:
+      - "php*"
+    recurse: false
+  no_log: true
+  register: found_binaries
 
 - name: create custom fact file
   bodsch.core.facts:
@@ -28,5 +38,8 @@
         package: "{{ php_package_version }}"
         major: "{{ php_major_version }}"
         full: "{{ php_version }}"
+      binary: "{{ found_binaries.files[0].path }}"
+      legacy: "{{ 'true' if php_package_name == 'php-legacy' else 'false' }}"
+      # includes: "/usr/include/{{ php_package_name }}"
 
 ...

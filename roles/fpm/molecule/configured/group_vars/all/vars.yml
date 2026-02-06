@@ -58,7 +58,7 @@ php_modules:
     content: |
       extension=memcached
   - name: xmlrpc
-    enabled: "{{ 'false' if ansible_os_family | lower == 'archlinux' else 'true' }}"
+    enabled: "{{ 'false' if ansible_facts.os_family | lower == 'archlinux' else 'true' }}"
     priority: 20
     content: |
       extension=xmlrpc

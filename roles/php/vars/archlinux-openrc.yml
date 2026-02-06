@@ -1,9 +1,9 @@
 ---
 
 php_defaults_packages:
-  - php{{ php_major_version }}
+  - "{{ php_package_name | default('php') }}{{ php_major_version }}"
 
 php_conf_paths:
-  - /etc/php{{ php_major_version }}
+  - "/etc/{{ php_package_name | default('php') }}{{ php_major_version }}"
 
 ...

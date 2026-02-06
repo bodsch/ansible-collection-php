@@ -3,6 +3,10 @@
 # choose your version!
 php_version: "8"
 
+# default are 'php'
+# fpr archlinu, you can choose also 'php-lecacy'
+php_package_name: "php"
+
 php_packages_state: present
 
 php_packages: []

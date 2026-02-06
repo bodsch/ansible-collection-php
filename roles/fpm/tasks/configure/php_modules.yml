@@ -27,5 +27,4 @@
       when:
         - php_modules is defined
 
-
 ...

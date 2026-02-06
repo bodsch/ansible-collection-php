@@ -1,5 +1,9 @@
 ---
 
+- name: merge php configuration between defaults and custom
+  ansible.builtin.set_fact:
+    php_fpm_global: "{{ php_fpm_defaults_global | combine(php_fpm_global, recursive=True) }}"
+
 - name: ensure configuration directories exist
   ansible.builtin.file:
     path: "{{ item }}"

@@ -4,20 +4,21 @@
 # (c) 2024, Bodo Schulz <bodo@boone-schulz.de>
 
 from __future__ import absolute_import, print_function
-import re
+
 import json
+import re
 
 from ansible.module_utils.basic import AnsibleModule
 
 
 class ComposerPackages(object):
-    """
-    """
+    """ """
+
     module = None
 
     def __init__(self, module):
         """
-          Initialize all needed Variables
+        Initialize all needed Variables
         """
         self.module = module
 
@@ -28,29 +29,24 @@ class ComposerPackages(object):
         self.composer_bin = module.get_bin_path("composer", False)
 
     def run(self):
-        """
-        """
-        result = dict(
-            failed=True,
-            msg="De wereld is om zeep."
-        )
+        """ """
+        result = dict(failed=True, msg="De wereld is om zeep.")
 
         result = self.package_management()
 
         return result
 
     def package_management(self):
-        """
-        """
+        """ """
         result_state = []
 
         installed_packages = self.installed_packages()
 
         for package in self.packages:
             res = {}
-            package_name = package.get('name', None)
-            package_release = package.get('release', None)
-            package_state = package.get('state', "present")
+            package_name = package.get("name", None)
+            package_release = package.get("release", None)
+            package_state = package.get("state", "present")
             package_installed = False
 
             if not package_name:
@@ -67,32 +63,24 @@ class ComposerPackages(object):
 
                 if package_release and package_release == _version:
                     _msg = f"is already installed in version {_version}."
-                    res[package_name].update({
-                        "changed": False,
-                        "msg": _msg
-                    })
+                    res[package_name].update({"changed": False, "msg": _msg})
                 else:
                     pass
 
             if package_installed and package_state == "absent":
                 result = self.remove_package(package_name)
-                res[package_name].update({
-                    "changed": result.get("changed"),
-                    "msg": result.get("msg")
-                })
+                res[package_name].update(
+                    {"changed": result.get("changed"), "msg": result.get("msg")}
+                )
             else:
                 _msg = "is already removed."
-                res[package_name].update({
-                    "changed": False,
-                    "msg": _msg
-                })
+                res[package_name].update({"changed": False, "msg": _msg})
 
             if package_state == "present":
                 result = self.install_package(package_name, package_release)
-                res[package_name].update({
-                    "changed": result.get("changed"),
-                    "msg": result.get("msg")
-                })
+                res[package_name].update(
+                    {"changed": result.get("changed"), "msg": result.get("msg")}
+                )
 
             if len(res) > 0:
                 result_state.append(res)
@@ -101,19 +89,14 @@ class ComposerPackages(object):
         # migrate a list of dict into dict
         combined_d = {key: value for d in result_state for key, value in d.items()}
         # find all changed and define our variable
-        changed = (len({k: v for k, v in combined_d.items() if v.get('changed')}) > 0)
+        changed = len({k: v for k, v in combined_d.items() if v.get("changed")}) > 0
 
-        result = dict(
-            changed=changed,
-            failed=False,
-            msg=result_state
-        )
+        result = dict(changed=changed, failed=False, msg=result_state)
 
         return result
 
     def installed_packages(self):
-        """
-        """
+        """ """
         installed = []
 
         args = []
@@ -133,8 +116,7 @@ class ComposerPackages(object):
         return {x.get("name"): x.get("version") for x in installed}
 
     def install_package(self, package_name, package_release):
-        """
-        """
+        """ """
         _changed = False
         _msg = "Nothing to install, update or remove."
 
@@ -156,29 +138,29 @@ class ComposerPackages(object):
         rc, out, err = self._exec(args)
 
         if rc == 0:
-            pattern = re.compile(r'Installing (?P<package>[a-zA-z\/].+) \((?P<version>[0-9\.]+)\).*', re.MULTILINE)
+            pattern = re.compile(
+                r"Installing (?P<package>[a-zA-z\/].+) \((?P<version>[0-9\.]+)\).*",
+                re.MULTILINE,
+            )
             result = re.search(pattern, err)
             if result:
-                _version = result.group('version')
+                _version = result.group("version")
 
                 _changed = True
                 _msg = f"successfull in version {_version} installed."
             else:
-                pattern = re.compile(r'Nothing to install, update or remove.*.*', re.MULTILINE)
+                pattern = re.compile(
+                    r"Nothing to install, update or remove.*.*", re.MULTILINE
+                )
                 result = re.search(pattern, err)
 
                 if result:
                     self.module.log(msg="  msg: 'Nothing to install, update or remove'")
 
-        return dict(
-            failed=(rc != 0),
-            changed=_changed,
-            msg=_msg
-        )
+        return dict(failed=(rc != 0), changed=_changed, msg=_msg)
 
     def remove_package(self, package):
-        """
-        """
+        """ """
         args = []
 
         _changed = False
@@ -195,24 +177,24 @@ class ComposerPackages(object):
         rc, out, err = self._exec(args)
 
         if rc == 0:
-            pattern = re.compile(r'.*Package operations:.*\n.*Removing (?P<package>[a-zA-z\/].+) \((?P<version>[0-9\.]+)\).*', re.MULTILINE)
+            pattern = re.compile(
+                r".*Package operations:.*\n.*Removing (?P<package>[a-zA-z\/].+) \((?P<version>[0-9\.]+)\).*",
+                re.MULTILINE,
+            )
             result = re.search(pattern, err)
             if result:
-                _version = result.group('version')
+                _version = result.group("version")
                 _msg = f"version {_version} successfull removed."
 
             _changed = True
 
-        return dict(
-            failed=(rc != 0),
-            changed=_changed,
-            msg=_msg
-        )
+        return dict(failed=(rc != 0), changed=_changed, msg=_msg)
 
     def _exec(self, args, env_vars=None, check_rc=False):
-        """
-        """
-        rc, out, err = self.module.run_command(args, environ_update=env_vars, check_rc=check_rc)
+        """ """
+        rc, out, err = self.module.run_command(
+            args, environ_update=env_vars, check_rc=check_rc
+        )
 
         if int(rc) != 0:
             self.module.log(msg=f"  rc : '{rc}'")
@@ -232,17 +214,10 @@ COMPOSER_HOME=/root/.composer
 
 
 def main():
-    """
-    """
+    """ """
     argument_spec = dict(
-        packages=dict(
-            default='',
-            type=list
-        ),
-        force=dict(
-            default=False,
-            type=bool
-        ),
+        packages=dict(default="", type=list),
+        force=dict(default=False, type=bool),
     )
 
     module = AnsibleModule(
@@ -259,5 +234,5 @@ def main():
 
 
 # import module snippets
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

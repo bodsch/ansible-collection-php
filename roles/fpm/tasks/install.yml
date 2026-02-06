@@ -25,7 +25,13 @@
 
 - name: add php version to various php packages
   ansible.builtin.set_fact:
-    php_packages: "{{ php_packages | bodsch.php.add_php_version(version=detected_php_version.available, os_family=ansible_os_family) }}"
+    php_packages: "{{ php_packages |
+        bodsch.php.add_php_version(
+            php_package_name=php_package_name | default('php'),
+            version=detected_php_version.available,
+            os_family=ansible_facts.os_family
+        )
+      }}"
 
 - name: merge php defaults and custom packages
   ansible.builtin.set_fact:
@@ -46,6 +52,6 @@
   notify:
     - restart php-fpm
   when:
-    - ansible_service_mgr | lower == 'openrc'
+    - ansible_facts.service_mgr | lower == 'openrc'
 
 ...

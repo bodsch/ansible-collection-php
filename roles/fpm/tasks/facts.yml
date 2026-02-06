@@ -1,5 +1,15 @@
 ---
 
+- name: find php binaries
+  ansible.builtin.find:
+    paths: "/usr/bin"
+    file_type: file
+    patterns:
+      - "php-fpm*"
+    recurse: false
+  no_log: true
+  register: found_binaries
+
 - name: create custom fact file
   bodsch.core.facts:
     name: php_fpm
@@ -8,9 +18,11 @@
       socket_directory: "{{ php_fpm_socket_directory }}"
       user: "{{ php_fpm_pool_user }}"
       group: "{{ php_fpm_pool_group }}"
+      binary: "{{ found_binaries.files[0].path }}"
+      legacy: "{{ 'true' if php_package_name == 'php-legacy' else 'false' }}"
       version:
         package: "{{ php_package_version }}"
-        major: "{{ php_major_version }}"
+        major: "{{ detected_php_version.available.major_version | default(omit) }}"
         full: "{{ php_version }}"
 
 ...

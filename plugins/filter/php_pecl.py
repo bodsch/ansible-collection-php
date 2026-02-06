@@ -1,6 +1,7 @@
 # python 3 headers, required if submitting to Ansible
 
-from __future__ import (absolute_import, print_function)
+from __future__ import absolute_import, print_function
+
 __metaclass__ = type
 
 from ansible.utils.display import Display
@@ -10,17 +11,16 @@ display = Display()
 
 class FilterModule(object):
     """
-        Ansible file jinja2 tests
+    Ansible file jinja2 tests
     """
 
     def filters(self):
         return {
-            'dependencies': self.dependencies,
+            "dependencies": self.dependencies,
         }
 
     def dependencies(self, data):
-        """
-        """
+        """ """
         dependencies = []
 
         if isinstance(data, list):
@@ -38,9 +38,9 @@ class FilterModule(object):
 
     def flatten_list(self, data):
         """
-            flatten a list
+        flatten a list
 
-            input: [[0,1,2],[8,9]]
-            return: [0,1,2,8,9]
+        input: [[0,1,2],[8,9]]
+        return: [0,1,2,8,9]
         """
         return [item for sublist in data for item in sublist]

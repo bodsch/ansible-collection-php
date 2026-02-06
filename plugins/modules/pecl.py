@@ -6,11 +6,12 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from __future__ import absolute_import, print_function
+
+import hashlib
 import json
 import os
 import re
 import time
-import hashlib
 
 from ansible.module_utils.basic import AnsibleModule
 
@@ -28,10 +29,10 @@ RETURN = r"""
 DEFAULT_ERROR_MSG = "De wereld is om zeep."
 
 
-class Checksum():
+class Checksum:
     """
-        TODO
-        use collection bodsch.core
+    TODO
+    use collection bodsch.core
     """
 
     def __init__(self, module):
@@ -39,18 +40,17 @@ class Checksum():
 
     def checksum(self, plaintext, algorithm="sha256"):
         """
-            compute checksum for plaintext
+        compute checksum for plaintext
         """
         _data = self._harmonize_data(plaintext)
 
         checksum = hashlib.new(algorithm)
-        checksum.update(_data.encode('utf-8'))
+        checksum.update(_data.encode("utf-8"))
 
         return checksum.hexdigest()
 
     def validate(self, checksum_file, data=None):
-        """
-        """
+        """ """
         # self.module.log(msg=f" - checksum_file '{checksum_file}'")
         old_checksum = None
 
@@ -69,7 +69,7 @@ class Checksum():
 
         return (changed, checksum, old_checksum)
 
-    def checksum_from_file(self, path, read_chunksize=65536, algorithm='sha256'):
+    def checksum_from_file(self, path, read_chunksize=65536, algorithm="sha256"):
         """
             Compute checksum of a file's contents.
 
@@ -84,8 +84,8 @@ class Checksum():
 
         if os.path.isfile(path):
             checksum = hashlib.new(algorithm)  # Raises appropriate exceptions.
-            with open(path, 'rb') as f:
-                for chunk in iter(lambda: f.read(read_chunksize), b''):
+            with open(path, "rb") as f:
+                for chunk in iter(lambda: f.read(read_chunksize), b""):
                     checksum.update(chunk)
                     # Release greenthread, if greenthreads are not used it is a noop.
                     time.sleep(0)
@@ -95,19 +95,17 @@ class Checksum():
             return None
 
     def write_checksum(self, checksum_file, checksum=None):
-        """
-        """
+        """ """
         with open(checksum_file, "w") as f:
             f.write(checksum)
 
     def _harmonize_data(self, data):
-        """
-        """
+        """ """
         if isinstance(data, dict):
             _data = json.dumps(data, sort_keys=True)
 
         if isinstance(data, list):
-            _data = ''.join(str(x) for x in data)
+            _data = "".join(str(x) for x in data)
 
         if isinstance(data, str):
             _data = data
@@ -119,11 +117,12 @@ class PhpPecl(object):
     """
     Main Class
     """
+
     module = None
 
     def __init__(self, module):
         """
-          Initialize all needed Variables
+        Initialize all needed Variables
         """
         self.module = module
 
@@ -140,14 +139,13 @@ class PhpPecl(object):
             self.php_module_dir = php_config.get("module_dir", None)
             self.php_config_dirs = php_config.get("config_dirs", [])
 
-        self.pecl_bin = self.module.get_bin_path('pecl', True)
-        self.pear_bin = self.module.get_bin_path('pear', True)
+        self.pecl_bin = self.module.get_bin_path("pecl", True)
+        self.pear_bin = self.module.get_bin_path("pear", True)
 
         self.cache_directory = "/var/cache/ansible/php_pecl"
 
     def run(self):
-        """
-        """
+        """ """
         _failed = True
 
         self.__create_directory(self.cache_directory)
@@ -163,15 +161,12 @@ class PhpPecl(object):
         self.module.log(msg=f"  - extension dir '{self.php_extension_dir}'")
 
         if self.state == "channel-update":
-            """
-            """
-            rc, out, err = self.__simple_pecl_command(["channel-update", "pecl.php.net"])
-
-            result = dict(
-                changed=False,
-                failed=False,
-                result=out
+            """ """
+            rc, out, err = self.__simple_pecl_command(
+                ["channel-update", "pecl.php.net"]
             )
+
+            result = dict(changed=False, failed=False, result=out)
 
         elif self.state == "install":
 
@@ -192,11 +187,21 @@ class PhpPecl(object):
             # migrate a list of dict into dict
             combined_d = {key: value for d in result_state for key, value in d.items()}
             # find all changed and define our variable
-            changed = {k: v for k, v in combined_d.items() if isinstance(v, dict) if v.get('changed')}
-            failed = {k: v for k, v in combined_d.items() if isinstance(v, dict) if v.get('failed')}
+            changed = {
+                k: v
+                for k, v in combined_d.items()
+                if isinstance(v, dict)
+                if v.get("changed")
+            }
+            failed = {
+                k: v
+                for k, v in combined_d.items()
+                if isinstance(v, dict)
+                if v.get("failed")
+            }
 
-            _changed = (len(changed) > 0)
-            _failed = (len(failed) > 0)
+            _changed = len(changed) > 0
+            _failed = len(failed) > 0
 
             # if not _failed:
             #     self.checksum.write_checksum(
@@ -204,11 +209,7 @@ class PhpPecl(object):
             #         checksum=checksum
             #     )
 
-            result = dict(
-                changed=_changed,
-                failed=_failed,
-                result=result_state
-            )
+            result = dict(changed=_changed, failed=_failed, result=result_state)
         elif self.state == "check":
 
             result_state, packages = self.__check()
@@ -217,44 +218,42 @@ class PhpPecl(object):
             # migrate a list of dict into dict
             combined_d = {key: value for d in result_state for key, value in d.items()}
             # find all changed and define our variable
-            changed = {k: v for k, v in combined_d.items() if isinstance(v, dict) if v.get('changed')}
-            failed = {k: v for k, v in combined_d.items() if isinstance(v, dict) if v.get('failed')}
+            changed = {
+                k: v
+                for k, v in combined_d.items()
+                if isinstance(v, dict)
+                if v.get("changed")
+            }
+            failed = {
+                k: v
+                for k, v in combined_d.items()
+                if isinstance(v, dict)
+                if v.get("failed")
+            }
             # installed = [k for k, v in combined_d.items() if isinstance(v, dict) if not v.get('installed')]
 
-            _changed = (len(changed) > 0)
-            _failed = (len(failed) > 0)
+            _changed = len(changed) > 0
+            _failed = len(failed) > 0
 
             result = dict(
-                changed=_changed,
-                failed=_failed,
-                result=result_state,
-                missing=packages
+                changed=_changed, failed=_failed, result=result_state, missing=packages
             )
         elif self.state == "clear-cache":
 
             rc, out, err = self.__clear_cache()
 
-            result = dict(
-                changed=False,
-                failed=False,
-                result=out
-            )
+            result = dict(changed=False, failed=False, result=out)
 
         else:
             rc, out, err = self.__simple_pecl_command(self.state)
 
-            result = dict(
-                changed=False,
-                failed=False,
-                result=out
-            )
+            result = dict(changed=False, failed=False, result=out)
 
         return result
 
     def php_information(self, command=None):
-        """
-        """
-        php_bin = self.module.get_bin_path('php', True)
+        """ """
+        php_bin = self.module.get_bin_path("php", True)
         args = []
         args.append(php_bin)
 
@@ -265,7 +264,7 @@ class PhpPecl(object):
         if command:
             # args.append(command)
             args.append("-r")
-            args.append(f"echo ini_get(\"{command}\");")
+            args.append(f'echo ini_get("{command}");')
 
         # self.module.log(msg=f"  - args '{args}'")
 
@@ -276,8 +275,7 @@ class PhpPecl(object):
         return (rc, out.strip(), err)
 
     def pecl_information(self, package):
-        """
-        """
+        """ """
         _name = package.lower()
         _version = None
 
@@ -292,15 +290,17 @@ class PhpPecl(object):
 
         if rc == 0:
             regex_name = re.compile(r".*Name.* (?P<pecl_name>.*).*")
-            regex_version = re.compile(r".*Release Version.* (?P<pecl_release>.*) \(.*\)")
+            regex_version = re.compile(
+                r".*Release Version.* (?P<pecl_release>.*) \(.*\)"
+            )
 
             pecl_name = re.search(regex_name, out)
             pecl_version = re.search(regex_version, out)
 
             if pecl_name:
-                _name = pecl_name.group('pecl_name')
+                _name = pecl_name.group("pecl_name")
             if pecl_name:
-                _version = pecl_version.group('pecl_release')
+                _version = pecl_version.group("pecl_release")
 
         # self.module.log(msg=f"  - name {_name}")
         # self.module.log(msg=f"  - version {_version}")
@@ -308,8 +308,7 @@ class PhpPecl(object):
         return _name, _version
 
     def __simple_pecl_command(self, command):
-        """
-        """
+        """ """
         self.module.log(msg=f"__simple_pecl_command({command})")
 
         args = []
@@ -328,8 +327,7 @@ class PhpPecl(object):
         return (rc, out, err)
 
     def __install(self):
-        """
-        """
+        """ """
         # self.module.log(msg="__install()")
 
         result_state = []
@@ -351,8 +349,7 @@ class PhpPecl(object):
 
         package_name = None
         for p in self.packages:
-            """
-            """
+            """ """
             res = {}
             package_name = p.get("name", None)
             package_state = p.get("state", "present")
@@ -360,26 +357,29 @@ class PhpPecl(object):
             package_enabled = p.get("enabled", True)
 
             if package_name:
-                self.module.log(msg=f"- package {package_name} should be {package_state} and {package_enabled}")
+                self.module.log(
+                    msg=f"- package {package_name} should be {package_state} and {package_enabled}"
+                )
 
                 _name, _version = self.pecl_information(package_name)
                 checksum = self.__check_pecl_package(_name)
 
-                self.module.log(f" - pecl {package_name} : {_name} / {_version} / {checksum}")
+                self.module.log(
+                    f" - pecl {package_name} : {_name} / {_version} / {checksum}"
+                )
 
                 # /usr/bin/pecl install channel://pecl.php.net/xmlrpc-1.0.0RC3 ...
 
                 if package_state == "present":
                     if not checksum:
                         """
-                            present version == package are available
-                            no checksum == package not installed
+                        present version == package are available
+                        no checksum == package not installed
                         """
                         res[package_name] = self.__install_pecl_package(p)
                     else:
                         res[package_name] = dict(
-                            changed=False,
-                            msg=f"{package_name} is already installed."
+                            changed=False, msg=f"{package_name} is already installed."
                         )
                 else:
                     res[package_name] = self.__uninstall_pecl_package(p)
@@ -394,8 +394,7 @@ class PhpPecl(object):
         return result_state
 
     def __check(self):
-        """
-        """
+        """ """
         self.module.log(msg="__check()")
 
         result_state = []
@@ -406,8 +405,7 @@ class PhpPecl(object):
 
         package_name = None
         for p in self.packages:
-            """
-            """
+            """ """
             res = {}
             self.module.log(msg=f"  - {p}")
 
@@ -441,7 +439,7 @@ class PhpPecl(object):
                         installed=True,
                         changed=False,
                         failed=True,
-                        msg=f"{package_name} is already installed, but not via pear."
+                        msg=f"{package_name} is already installed, but not via pear.",
                     )
 
                     pac.remove(p)
@@ -450,7 +448,7 @@ class PhpPecl(object):
                     res[package_name] = dict(
                         installed=True,
                         changed=False,
-                        msg=f"{package_name} is already with version {_version} installed."
+                        msg=f"{package_name} is already with version {_version} installed.",
                     )
 
                     pac.remove(p)
@@ -462,21 +460,16 @@ class PhpPecl(object):
         return result_state, pac
 
     def __clear_cache(self):
-        """
-        """
+        """ """
         _, out, err = self.__simple_pecl_command("clear-cache")
 
         return (0, out.strip(), err.strip())
 
     def __check_pecl_package(self, package):
-        """
-        """
+        """ """
         self.module.log(msg=f"__check_pecl_package({package})")
 
-        package_so_name = os.path.join(
-            self.php_extension_dir,
-            f"{package}.so"
-        )
+        package_so_name = os.path.join(self.php_extension_dir, f"{package}.so")
 
         self.module.log(msg=f"  - package_so_name: {package_so_name}")
 
@@ -488,8 +481,7 @@ class PhpPecl(object):
         return None
 
     def __install_pecl_package(self, package):
-        """
-        """
+        """ """
         self.module.log(msg=f"__install_pecl_package({package})")
 
         package_name = package.get("name", None)
@@ -502,7 +494,9 @@ class PhpPecl(object):
         if package_version:
             package_name += f"-{package_version}"
 
-        checksum_file = os.path.join(os.path.join(self.cache_directory, f"{package_name}.checksum"))
+        checksum_file = os.path.join(
+            os.path.join(self.cache_directory, f"{package_name}.checksum")
+        )
 
         args = []
         args.append(self.pecl_bin)
@@ -517,32 +511,23 @@ class PhpPecl(object):
 
         if rc == 0:
             """
-                build successful
-                next step:
-                    - build checksum of created file
-                    - enable module
+            build successful
+            next step:
+                - build checksum of created file
+                - enable module
             """
             msg = f"{package_name} successful installed."
 
             _name, _version = self.pecl_information(package_name)
             checksum = self.__check_pecl_package(_name)
 
-            self.checksum.write_checksum(
-                checksum_file=checksum_file,
-                checksum=checksum
-            )
+            self.checksum.write_checksum(checksum_file=checksum_file, checksum=checksum)
 
-        return dict(
-            rc=rc,
-            args=' '.join(args),
-            failed=False,
-            changed=True,
-            msg=msg
-        )
+        return dict(rc=rc, args=" ".join(args), failed=False, changed=True, msg=msg)
 
     def __uninstall_pecl_package(self, package):
         """
-            remove named pecl package and his corresponding checksum file and configs
+        remove named pecl package and his corresponding checksum file and configs
         """
         package_name = package.get("name", None)
         package_priority = package.get("priority", 80)
@@ -551,7 +536,9 @@ class PhpPecl(object):
         _changed = False
         _msg = f"{package_name} is not installed."
 
-        checksum_file = os.path.join(os.path.join(self.cache_directory, f"{package_name.lower()}.checksum"))
+        checksum_file = os.path.join(
+            os.path.join(self.cache_directory, f"{package_name.lower()}.checksum")
+        )
 
         # get package informations
         _name, _version = self.pecl_information(package_name)
@@ -571,31 +558,30 @@ class PhpPecl(object):
 
         self.__disable_pecl_module(package_name, package_priority, checksum_file)
 
-        return dict(
-            changed=_changed,
-            msg=_msg
-        )
+        return dict(changed=_changed, msg=_msg)
 
     def __enable_pecl_module(self, package_name, package_priority):
         """
-            create config file and links
+        create config file and links
         """
         self.module.log(msg=f"__enable_pecl_module({package_name}, {package_priority})")
         # config file
         config_file = os.path.join(self.php_module_dir, f"{package_name.lower()}.ini")
 
-        with open(config_file, 'w+') as outfile:
+        with open(config_file, "w+") as outfile:
             outfile.write(f"extension={package_name.lower()}\n")
 
         # config links
         for d in self.php_config_dirs:
-            destination = os.path.join(d, f"{package_priority}-{package_name.lower()}.ini")
+            destination = os.path.join(
+                d, f"{package_priority}-{package_name.lower()}.ini"
+            )
 
             self.__create_link(source=config_file, destination=destination)
 
     def __disable_pecl_module(self, package_name, package_priority, checksum_file=None):
         """
-            create config file and links
+        create config file and links
         """
         # files to remove ..
         _files = []
@@ -607,7 +593,9 @@ class PhpPecl(object):
         _files.append(os.path.join(self.php_module_dir, f"{package_name.lower()}.ini"))
         # config links
         for d in self.php_config_dirs:
-            _files.append(os.path.join(d, f"{package_priority}-{package_name.lower()}.ini"))
+            _files.append(
+                os.path.join(d, f"{package_priority}-{package_name.lower()}.ini")
+            )
 
         self.module.log(f"  - {_files}")
 
@@ -616,8 +604,7 @@ class PhpPecl(object):
                 os.remove(f)
 
     def __create_directory(self, dir):
-        """
-        """
+        """ """
         try:
             os.makedirs(dir, exist_ok=True)
         except FileExistsError:
@@ -629,8 +616,7 @@ class PhpPecl(object):
             return False
 
     def __create_link(self, source, destination, force=False):
-        """
-        """
+        """ """
         if force:
             os.remove(destination)
             os.symlink(source, destination)
@@ -645,7 +631,7 @@ class PhpPecl(object):
 
     def __exec(self, commands, check_rc=False):
         """
-          execute shell program
+        execute shell program
         """
         rc, out, err = self.module.run_command(commands, check_rc=check_rc)
 
@@ -658,8 +644,7 @@ class PhpPecl(object):
 
 
 def main():
-    """
-    """
+    """ """
     args = dict(
         state=dict(
             type=str,
@@ -671,20 +656,12 @@ def main():
                 "list-channels",
                 "list-upgrades",
                 "channel-update",
-                "upgrade"
+                "upgrade",
             ],
             default="list",
         ),
-        packages=dict(
-            required=False,
-            default=[],
-            type=list
-        ),
-        php_config=dict(
-            required=False,
-            default={},
-            type=dict
-        )
+        packages=dict(required=False, default=[], type=list),
+        php_config=dict(required=False, default={}, type=dict),
     )
 
     module = AnsibleModule(
@@ -712,5 +689,5 @@ def main():
 
 
 # import module snippets
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

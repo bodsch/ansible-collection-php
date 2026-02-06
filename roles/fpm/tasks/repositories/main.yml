@@ -3,7 +3,7 @@
 - name: debian repositories
   ansible.builtin.include_tasks: repositories/debian.yml
   when:
-    - ansible_os_family | lower == 'debian'
+    - ansible_facts.os_family | lower == 'debian'
 
 - name: update package cache
   become: true

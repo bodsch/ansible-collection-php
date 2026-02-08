@@ -71,14 +71,11 @@ class AnsibleModuleLike(Protocol):
         cwd: Optional[str] = None,
         environ_update: Optional[Mapping[str, str]] = None,
         check_rc: bool = True,
-    ) -> Tuple[int, str, str]:
-        ...
+    ) -> Tuple[int, str, str]: ...
 
-    def get_bin_path(self, arg: str, required: bool = False) -> Optional[str]:
-        ...
+    def get_bin_path(self, arg: str, required: bool = False) -> Optional[str]: ...
 
-    def log(self, msg: str = "", **kwargs: Any) -> None:
-        ...
+    def log(self, msg: str = "", **kwargs: Any) -> None: ...
 
 
 class PHPModules(object):
@@ -103,7 +100,7 @@ class PHPModules(object):
 
         self.php_binary = self.module.get_bin_path("php", False)
 
-        (self.distribution, self.version, self.codename) = distro.linux_distribution(
+        self.distribution, self.version, self.codename = distro.linux_distribution(
             full_distribution_name=False
         )
 

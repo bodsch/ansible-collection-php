@@ -168,7 +168,7 @@ class ComposerInstaller(object):
         args = []
 
         if self.composer_bin and os.path.exists(self.composer_bin):
-            (changed, checksum_from_file, old_checksum) = (
+            changed, checksum_from_file, old_checksum = (
                 self.checksum.validate_from_file(
                     checksum_file=self.composer_bin_checksum,
                     data_file=self.composer_bin,

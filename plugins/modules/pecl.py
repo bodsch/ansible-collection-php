@@ -12,6 +12,7 @@ import json
 import os
 import re
 import time
+# from typing import Any, Dict, List
 
 from ansible.module_utils.basic import AnsibleModule
 
@@ -244,6 +245,14 @@ class PhpPecl(object):
             )
         elif self.state == "clear-cache":
 
+            _pecl_config = self.pecl_config()
+            _pecl_dirs = self.filter_dir_keys(items=_pecl_config)
+            self.module.log(f"  - dirs {_pecl_dirs}")
+
+            cache_dir = [x for x in _pecl_dirs if x.get("key") == "cache_dir"][0]
+
+            self.__create_directory(cache_dir.get("value"))
+
             rc, out, err = self.__clear_cache()
 
             result = dict(changed=False, failed=False, result=out)
@@ -315,6 +324,96 @@ class PhpPecl(object):
 
         return _name, _version
 
+    def pecl_config(self):
+        """ """
+        self.module.log("PhpPecl::pecl_config()")
+
+        parsed_data = None
+
+        args = []
+        args.append(self.pecl_bin)
+        args.append("config-show")
+
+        self.module.log(f"  - args {args}")
+
+        rc, out, err = self.__exec(args, check_rc=False)
+
+        self.module.log(f"  - out {out}")
+        self.module.log(f"        {type(out)}")
+
+        if rc != 0:
+            return None
+
+        parsed_data = self.parse_pecl_config(out)
+        self.module.log(f"final: {parsed_data}")
+        return parsed_data
+
+    def parse_pecl_config(self, text: str) -> list[dict]:
+        """ """
+        self.module.log(f"PhpPecl::parse_pecl_config(text: {text})")
+
+        parsed = []
+
+        KEY = r"(?P<key>[A-Za-z][A-Za-z0-9_]*)"
+        VAL = r"(?P<value>\S.*)"
+
+        LINE_RES = [
+            # 1) label  (2+ spaces)  key  (2+ spaces)  value
+            re.compile(rf"^\s*.*?\S\s{{2,}}{KEY}\s{{2,}}{VAL}\s*$"),
+            # 2) label  (2+ spaces)  key  (1+ spaces)  value
+            #    (fix für preferred_mirror pecl.php.net)
+            re.compile(rf"^\s*.*?\S\s{{2,}}{KEY}\s+{VAL}\s*$"),
+            # 3) label  (1+ spaces)  key  (2+ spaces)  value
+            #    (fix für ... directory cache_dir        /tmp/...)
+            re.compile(rf"^\s*.*?\S\s+{KEY}\s{{2,}}{VAL}\s*$"),
+        ]
+
+        for line in text.splitlines():
+            line = line.rstrip("\n")
+
+            match = None
+            for rx in LINE_RES:
+                match = rx.match(line)
+                if match:
+                    parsed.append(
+                        {
+                            "key": match.group("key"),
+                            "value": match.group("value").strip(),
+                        }
+                    )
+                    break
+
+            # optional: zum Debuggen unmatched lines loggen
+            # if not match and line.strip():
+            #     print("UNMATCHED:", repr(line))
+
+        return parsed
+
+    def filter_dir_keys(self, items: list[dict]) -> list[dict]:
+        """"""
+        self.module.log(f"PhpPecl::filter_dir_keys(items: {items})")
+
+        return [
+            d for d in items if d["key"].endswith("_dir") or d["key"].endswith("dir")
+        ]
+        # return [d for d in items if d["key"].endswith("_dir")]
+
+    #         # get ony dirs
+    #         _dirs = [d for d in parsed_data if d["key"].endswith("_dir")]
+    #
+    #         self.module.log(_dirs)
+    #
+    #         for line in out.split('\n'):
+    #             match = pattern.search(line)
+    #             if match:
+    #                 parsed_data.append(match.groupdict())
+    #
+    #         # 3. Filter erstellen (matched alle keys die '_dir' beinhalten)
+    #         dir_filter = [item for item in parsed_data if '_dir' in item['key']]
+    #
+    #         # Ausgabe zur Überprüfung
+    #         print(json.dumps(dir_filter, indent=2))
+
     def __simple_pecl_command(self, command):
         """ """
         self.module.log(f"PhpPecl::__simple_pecl_command({command})")
@@ -365,7 +464,7 @@ class PhpPecl(object):
             package_enabled = p.get("enabled", True)
 
             if package_name:
-                _enabled = 'enabled' if package_enabled else 'disabled'
+                _enabled = "enabled" if package_enabled else "disabled"
                 self.module.log(
                     msg=f"- package {package_name} should be {package_state} and {_enabled}"
                 )
@@ -427,7 +526,9 @@ class PhpPecl(object):
                 _name, _version = self.pecl_information(package_name)
                 checksum = self.__check_pecl_package(_name)
 
-                self.module.log(f"      name: {_name}, version: {_version}, checksum: '{checksum}'")
+                self.module.log(
+                    f"      name: {_name}, version: {_version}, checksum: '{checksum}'"
+                )
 
                 if not _version and not checksum:
                     res[package_name] = dict(
@@ -578,7 +679,9 @@ class PhpPecl(object):
         """
         create config file and links
         """
-        self.module.log(f"PhpPecl::__enable_pecl_module(package_name: {package_name}, package_priority: {package_priority})")
+        self.module.log(
+            f"PhpPecl::__enable_pecl_module(package_name: {package_name}, package_priority: {package_priority})"
+        )
         # config file
         config_file = os.path.join(self.php_module_dir, f"{package_name.lower()}.ini")
 

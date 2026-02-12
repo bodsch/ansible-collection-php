@@ -1,7 +1,7 @@
 # python 3 headers, required if submitting to Ansible
 from __future__ import absolute_import, division, print_function
 
-from typing import Any, List, Mapping, Sequence
+from typing import Any, Dict, List, Mapping, Sequence
 
 from ansible.utils.display import Display
 from packaging.version import Version
@@ -89,48 +89,11 @@ class FilterModule(object):
         display.v(f"  = {packages}")
         return packages
 
-    def add_version_OLD(self, data, php_package_name, version, os_family):
+    def verify_version(
+        self, data: Dict, version: str, field: str = "major_version"
+    ) -> bool:
         """ """
-        display.v(
-            f"add_version(data: {data}, php_package_name: {php_package_name}, version: {version}, os_family: {os_family})"
-        )
-
-        php_major_version = version.get("major_version", None)
-
-        # display.v(f"  = {php_major_version}")
-
-        if os_family.lower() == "debian":
-            version = php_major_version
-
-        # display.v(f"  = {version}")
-
-        packages = []
-
-        if os_family.lower() == "debian" and int(php_major_version) == 8:
-            for i in data:
-                if i in [
-                    "php-opcache"
-                ]:  # , "php-yaml", "php-xml", "php-xmlrpc", "php-sqlite3"]:
-                    packages.append(i.replace("php", f"php{version}"))
-                else:
-                    packages.append(i)
-
-        if os_family.lower() == "archlinux":
-            if php_package_name == "php-legacy":
-                for i in data:
-                    display.v(f"  - {i}")
-                    if "php-legacy" not in i:
-                        packages.append(i.replace("php", php_package_name))
-
-        display.v(f"  = {packages}")
-
-        return packages
-
-    def verify_version(self, data, version):
-        """ """
-        display.v("verify_version(data, version)")
-        display.v(f"  - data   : {data}")
-        display.v(f"  - version: {version}")
+        display.v(f"verify_version(data: {data}, version: {version}, field: {field})")
 
         result = False
 

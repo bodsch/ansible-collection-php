@@ -16,7 +16,7 @@ def test_installed_package(host, get_vars):
     package = "php-cli"
     distribution = host.system_info.distribution
 
-    _facts = local_facts(host=host, fact="php_fpm")
+    _facts = local_facts(host=host, fact="php")
 
     # print(distribution)
     # print(_facts)
@@ -42,7 +42,7 @@ def test_installed_custom_package(host, get_vars):
     """
     custom packages
     """
-    _facts = local_facts(host=host, fact="php_fpm")
+    _facts = local_facts(host=host, fact="php")
 
     custom_packages = get_vars.get("php_packages")
     distribution = host.system_info.distribution
@@ -72,7 +72,7 @@ def test_directories(host, get_vars):
     test created directories
     """
     distribution = host.system_info.distribution
-    _facts = local_facts(host=host, fact="php_fpm")
+    _facts = local_facts(host=host, fact="php")
 
     print(distribution)
     print(_facts.get("version"))

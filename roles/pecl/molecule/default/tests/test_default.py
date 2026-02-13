@@ -159,13 +159,24 @@ def test_directories(host, get_vars):
 
 def test_files(host, get_vars):
     """ """
+    distribution = host.system_info.distribution
+
     files = [
         # "/usr/bin/php",
         "/usr/bin/pecl",
         "/usr/bin/pear",
-        "/usr/share/php/pearcmd.php",
-        "/usr/share/php/peclcmd.php",
     ]
+
+    if distribution in ["debian", "ubuntu"]:
+        files += [
+            "/usr/share/php/pearcmd.php",
+            "/usr/share/php/peclcmd.php",
+        ]
+    elif distribution in ["arch", "artix"]:
+        files += [
+            "/usr/share/pear/pearcmd.php",
+            "/usr/share/pear/peclcmd.php",
+        ]
 
     for _file in files:
         f = host.file(_file)

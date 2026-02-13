@@ -30,9 +30,9 @@ def test_installed_package(host, get_vars):
             if package_version == 7:
                 package = f"php{package_version}"
             else:
-                package = "php-fpm"
+                package = "php"
                 if "legacy" in _facts.get("binary"):
-                    package = "php-legacy-fpm"
+                    package = "php-legacy"
 
         p = host.package(package)
         assert p.is_installed

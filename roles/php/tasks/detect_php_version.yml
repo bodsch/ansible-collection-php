@@ -17,7 +17,8 @@
 
 - name: "set php_version '{{ detected_php_version.available.platform_version }}'"
   ansible.builtin.set_fact:
-    php_version: "{{ detected_php_version.available.full_version }}"
+    php_version: "{{ detected_php_version.available.platform_version }}"
+    php_full_version: "{{ detected_php_version.available.full_version }}"
     php_package_version: "{{ detected_php_version.available.platform_version }}"
     php_major_version: "{{ detected_php_version.available.major_version }}"
   when:

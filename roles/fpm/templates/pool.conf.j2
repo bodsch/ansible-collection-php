@@ -3,15 +3,7 @@
 
 [{{ item.name }}]
 {% set pools_directives = php_fpm_pool_defaults | default(dict()) | combine(item) %}
-{% set listen = '' %}
-{% if 'listen_port' in pools_directives %}
-  {% if 'listen_host' in pools_directives %}
-    {% set listen = listen ~ pools_directives['listen_host'] + ':' %}
-  {% endif %}
-  {% set listen = listen ~ pools_directives['listen_port'] %}
-{% elif 'listen' in pools_directives %}
-  {% set listen = pools_directives['listen'] %}
-{% endif %}
+{% set listen = pools_directives | bodsch.php.fpm_listener(socket_directory=php_fpm_socket_directory) %}
 
 {% if listen %}
 listen = {{ listen }}

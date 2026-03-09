@@ -16,35 +16,20 @@
     - name: debian
       when:
         ansible_facts.distribution | lower == "debian"
-      block:
-        - name: Download Sury archive keyring .deb
-          ansible.builtin.get_url:
-            url: https://packages.sury.org/debsuryorg-archive-keyring.deb
-            dest: /var/cache/apt/debsuryorg-archive-keyring.deb
-            mode: "0644"
-          become: true
-
-        - name: Install Sury archive keyring package
-          ansible.builtin.apt:
-            deb: /var/cache/apt/debsuryorg-archive-keyring.deb
-            state: present
-            update_cache: false
-          become: true
-          register: debsuryorg_apt_key
-
-        - name: add debsuryorg apt repository
-          when:
-            - debsuryorg_apt_key.changed
-          ansible.builtin.copy:
-            dest: /etc/apt/sources.list.d/debsuryorg.sources
-            content: |
-              Types: deb
-              URIs: https://packages.sury.org/php/
-              Components: main
-              Suites: {{ ansible_facts.distribution_release }}
-              Signed-By: /usr/share/keyrings/debsuryorg-archive-keyring.gpg
-            mode: '0644'
-          register: debsuryorg_apt_repository
+      bodsch.core.apt_sources:
+        name: debsuryorg-archive
+        filename: debsuryorg-archive.sources
+        uris:
+          - https://packages.sury.org/php/
+        suites: "{{ ansible_facts.distribution_release | lower }}"
+        components:
+          - main
+        signed_by: /usr/share/keyrings/debsuryorg-archive-keyring.gpg
+        key:
+          method: deb
+          url: "https://packages.sury.org/debsuryorg-archive-keyring.deb"
+          dest: "/var/cache/apt/debsuryorg-archive-keyring.deb"
+        update_cache: true
 
     - name: ubuntu
       when:

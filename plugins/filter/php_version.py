@@ -122,7 +122,9 @@ class FilterModule(object):
             ``True`` if the requested version matches the selected metadata
             value, otherwise ``False``.
         """
-        display.vv(f"bodsch.php.verify_version(data: {data}, version: {version}, field: {field})")
+        display.vv(
+            f"bodsch.php.verify_version(data: {data}, version: {version}, field: {field})"
+        )
 
         requested_version = (version or "").strip()
 

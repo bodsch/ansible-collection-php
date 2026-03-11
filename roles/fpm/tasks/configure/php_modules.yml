@@ -11,12 +11,13 @@
         state: directory
         owner: root
         group: root
-        mode: 0755
+        mode: "0755"
       when:
         - php_modules_conf_paths is defined
 
     - name: configure modules
       bodsch.php.php_modules:
+        php_version: "{{ php_full_version }}"
         php_modules: "{{ php_modules }}"
         php_modules_path: "{{ php_modules_conf_paths }}"
         dest: "{{ php_conf_paths }}"

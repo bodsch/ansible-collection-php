@@ -48,7 +48,7 @@
   ansible.builtin.template:
     src: init/openrc/init.d/php-fpm.j2
     dest: /etc/init.d/php{{ php_major_version }}-fpm
-    mode: 0755
+    mode: "0755"
   notify:
     - restart php-fpm
   when:

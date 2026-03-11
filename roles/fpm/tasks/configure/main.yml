@@ -8,7 +8,7 @@
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
-    mode: 0755
+    mode: "0755"
     follow: true
   with_community.general.flattened:
     - "{{ php_conf_paths }}"
@@ -18,7 +18,7 @@
   ansible.builtin.file:
     path: "{{ php_fpm_log_directory }}"
     state: directory
-    mode: 0755
+    mode: "0755"
 
 - name: ensure temp directory for upload exist
   ansible.builtin.file:
@@ -26,7 +26,7 @@
     state: directory
     owner: "{{ php_fpm_pool_user }}"
     group: "{{ php_fpm_pool_group }}"
-    mode: 0755
+    mode: "0755"
 
 - name: ensure socket directory exist
   ansible.builtin.file:
@@ -34,7 +34,7 @@
     state: directory
     owner: "{{ php_fpm_pool_user }}"
     group: "{{ php_fpm_pool_group }}"
-    mode: 0755
+    mode: "0755"
 
 - name: create php.ini configuration files
   ansible.builtin.template:
@@ -42,7 +42,7 @@
     dest: "{{ item }}/php.ini"
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
     backup: true
   loop:
     "{{ php_conf_paths }}"
@@ -62,7 +62,7 @@
     state: directory
     owner: root
     group: root
-    mode: 0755
+    mode: "0755"
   when:
     - php_fpm_pool_conf_path_dir_stat.stat.islnk is not defined
 
@@ -74,7 +74,7 @@
     group: root
     force: true
     backup: true
-    mode: 0644
+    mode: "0644"
   notify:
     - restart php-fpm
 

@@ -15,7 +15,6 @@ import time
 
 from ansible.module_utils.basic import AnsibleModule
 
-
 __metaclass__ = type
 
 DOCUMENTATION = r"""

@@ -26,7 +26,7 @@ tags:
   - web
 
 dependencies:
-  bodsch.core: ">=2.10.1"
+  bodsch.core: ">=2.11.0"
 
 repository: https://github.com/bodsch/ansible-collection-php
 documentation: https://github.com/bodsch/ansible-collection-php/README.md

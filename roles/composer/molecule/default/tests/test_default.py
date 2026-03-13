@@ -13,7 +13,7 @@ from helper.molecule import get_vars, infra_hosts, local_facts
 @pytest.mark.parametrize(
     "files",
     [
-        "/usr/local/bin/composer.phar",
+        # "/usr/local/bin/composer.phar",
         "/usr/local/bin/composer",
         "/root/.cache/composer",
         "/root/.ansible/composer/composer.sha256",

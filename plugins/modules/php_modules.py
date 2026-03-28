@@ -26,6 +26,8 @@ from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, Union, cast
 
+from ansible_collections.bodsch.php.plugins.module_utils.temp_file import WritableTempFile
+from ansible_collections.bodsch.php.plugins.module_utils.atomic_file import AtomicFileWriter
 from ansible.module_utils import distro
 from ansible.module_utils.basic import AnsibleModule
 
@@ -341,6 +343,8 @@ class PHPModules(object):
         Returns:
             A result dictionary containing C(changed), C(failed), and C(msg).
         """
+        self.module.log("PHPModules::run()")
+
         if not self.__create_directory(self.php_modules_cache_directory):
             return {
                 "failed": True,
@@ -359,10 +363,14 @@ class PHPModules(object):
 
         if isinstance(self.php_modules, list):
             for module_definition in self.__iter_module_definitions(self.php_modules):
+
                 module_result = self.__process_module(
                     module_definition=module_definition,
                     extension_directory=extension_directory,
                 )
+
+                self.module.log(f"module_result: {module_result}")
+
                 result_state.append({module_definition.name: module_result})
 
         changed = any(
@@ -411,6 +419,8 @@ class PHPModules(object):
             C(True) if the extension can be considered available, otherwise
             C(False).
         """
+        self.module.log(f"PHPModules::extension_available(extension_directory: {extension_directory}, module_content: {module_content})")
+
         if not isinstance(module_content, str) or not module_content.strip():
             return False
 
@@ -478,6 +488,8 @@ class PHPModules(object):
         Returns:
             True if the configuration file content changed, otherwise False.
         """
+        self.module.log(f"PHPModules::write_module_configuration(module_name: {module_name}, file_name: {file_name}, data)")
+
         checksum_file = os.path.join(
             self.php_modules_cache_directory, f"{module_name}.checksum"
         )
@@ -497,6 +509,9 @@ class PHPModules(object):
 
         normalized_data = self.__normalize_module_content(module_name, data)
         rendered_data = self.__templated_data(normalized_data)
+
+        self.module.log(f"  - normalized: {normalized_data}")
+        self.module.log(f"  - rendered  : {rendered_data.strip()}")
 
         changed, new_checksum, old_checksum = self.__has_changed(
             file_name, checksum_file, rendered_data
@@ -614,6 +629,8 @@ class PHPModules(object):
         Returns:
             C(True) when at least one path was removed, otherwise C(False).
         """
+        self.module.log(f"PHPModules::disable_module(module_link_names: {module_link_names})")
+
         changed = False
 
         for link in module_link_names:
@@ -676,11 +693,31 @@ class PHPModules(object):
         Returns:
             Per-module result dictionary compatible with the current module output.
         """
+        self.module.log(f"PHPModules::__process_module(module_definition: {module_definition}, extension_directory: {extension_directory})")
+
+        self.module.log(f"=> module: {module_definition.name} , enabled: {module_definition.enabled} , prio: {module_definition.priority}")
+
+        changed = False
+        changed_enable = False
+        changed_disable = False
+        state_message: Optional[str] = None
+
         module_file_name = os.path.join(
             self.php_modules_path,
             f"{module_definition.name}.ini",
         )
 
+        # write ini file
+        changed_write = self.write_module_configuration(
+            module_definition.name,
+            module_file_name,
+            module_definition.content,
+        )
+
+        if changed_write:
+            state_message = "Module successfully written."
+
+        # ------------------------------------------------------------------------------------------
         module_link_names = [
             os.path.join(
                 path,
@@ -695,33 +732,9 @@ class PHPModules(object):
             module_content=module_definition.content,
         )
 
-        changed_write = self.write_module_configuration(
-            module_definition.name,
-            module_file_name,
-            module_definition.content,
-        )
-
-        changed_enable = False
-        changed_disable = False
-        state_message: Optional[str] = None
-
-        if changed_write:
-            state_message = "Module successfully written."
-
-        if module_definition.enabled and module_installed:
-            changed_enable, _details = self.enable_module(
-                module_file_name,
-                module_link_names,
-            )
-
-            if changed_enable:
-                state_message = (
-                    "Module successfully written and enabled."
-                    if changed_write
-                    else "Module successfully enabled."
-                )
-
-        elif not module_definition.enabled or not module_installed:
+        # deactivate module
+        if not bool(module_definition.enabled) or not module_installed:
+            self.module.log("    - disable module")
             changed_disable = self.disable_module(module_link_names)
 
             if changed_disable:
@@ -730,13 +743,58 @@ class PHPModules(object):
                         "Module is not installed and has therefore not been activated."
                     )
                 else:
+                    changed = True
                     state_message = "Module successfully disabled."
 
-        changed = changed_write or changed_enable or changed_disable
+            result: Dict[str, Any] = {"changed": changed}
 
-        result: Dict[str, Any] = {"changed": changed}
-        if state_message:
-            result["state"] = state_message
+            if state_message:
+                result["state"] = state_message
+
+        # ------------------------------------------------------------------------------------------
+        # activate module
+        else:
+            # changed_write = self.write_module_configuration(
+            #     module_definition.name,
+            #     module_file_name,
+            #     module_definition.content,
+            # )
+            #
+            # if changed_write:
+            #     state_message = "Module successfully written."
+            self.module.log("    - enable module")
+
+            if module_definition.enabled and module_installed:
+                changed_enable, _details = self.enable_module(
+                    module_file_name,
+                    module_link_names,
+                )
+
+                if changed_enable:
+                    state_message = (
+                        "Module successfully written and enabled."
+                        if changed_write
+                        else "Module successfully enabled."
+                    )
+
+            # elif not module_definition.enabled or not module_installed:
+            #     changed_disable = self.disable_module(module_link_names)
+            #
+            #     if changed_disable:
+            #         if not module_installed:
+            #             state_message = (
+            #                 "Module is not installed and has therefore not been activated."
+            #             )
+            #         else:
+            #             state_message = "Module successfully disabled."
+
+            changed = changed_write or changed_enable or changed_disable
+
+            result: Dict[str, Any] = {"changed": changed}
+            if state_message:
+                result["state"] = state_message
+
+        self.module.log(f"= result: {result}")
 
         return result
 
@@ -755,33 +813,137 @@ class PHPModules(object):
             checksum: Calculated checksum value.
             checksum_file: Destination checksum file path.
         """
+        self.module.log(f"PHPModules::__write_template(data, data_file: {data_file}, checksum: {checksum}, checksum_file: {checksum_file})")
+
+        file_handle = None
+
         data_path = Path(data_file)
         data_path.parent.mkdir(parents=True, exist_ok=True)
 
-        with NamedTemporaryFile(
-            "w",
-            delete=False,
-            dir=str(data_path.parent),
-            encoding="utf-8",
-        ) as file_handle:
-            file_handle.write(data)
-            tmp_name = file_handle.name
+        self.module.log(f"  - file: {data_file}")
+        try:
+            with AtomicFileWriter(
+                destination=data_file,
+                mode="w",
+                encoding="utf-8",
+            ) as file_handle:
+                # self.module.log(f"  - tmp_name: {file_handle.name}")
+                # self.module.log(data)
 
-        os.replace(tmp_name, data_file)
+                file_handle.write(data)
 
+            exists = data_path.exists()
+            self.module.log(f"  - destination exists after commit: {exists}")
+
+            if not exists:
+                raise OSError(f"Atomic write reported success, but destination is missing: {data_file}")
+
+
+        except (FileNotFoundError, NotADirectoryError, PermissionError, OSError) as exc:
+            self.module.log(f"ERROR: Atomic file write failed: {exc}")
+            raise
+
+        file_handle = None
         checksum_path = Path(checksum_file)
         checksum_path.parent.mkdir(parents=True, exist_ok=True)
 
-        with NamedTemporaryFile(
-            "w",
-            delete=False,
-            dir=str(checksum_path.parent),
-            encoding="utf-8",
-        ) as file_handle:
-            file_handle.write(checksum)
-            tmp_checksum = file_handle.name
+        self.module.log(f"  - file: {checksum_file}")
+        try:
+            with AtomicFileWriter(
+                destination=checksum_file,
+                mode="w",
+                encoding="utf-8",
+            ) as file_handle:
+                self.module.log(f"  - tmp_name: {file_handle.name}")
+                # self.module.log(checksum)
 
-        os.replace(tmp_checksum, checksum_file)
+                file_handle.write(checksum)
+
+            exists = checksum_path.exists()
+            self.module.log(f"  - destination exists after commit: {exists}")
+
+            if not exists:
+                raise OSError(f"Atomic write reported success, but destination is missing: {checksum_file}")
+
+        except (FileNotFoundError, NotADirectoryError, PermissionError, OSError) as exc:
+            self.module.log(f"ERROR: Atomic file write failed: {exc}")
+            raise
+
+        # try:
+        #     with WritableTempFile(
+        #         mode="w",
+        #         directory=str(data_path.parent),
+        #         encoding="utf-8",
+        #         delete_on_exit=False,
+        #     ) as file_handle:
+        #         tmp_name = file_handle.name
+        #         self.module.log(f"  - tmp_name: {tmp_name}")
+        #
+        #         self.module.log(data)
+        #
+        #         file_handle.write(data)
+        #         file_handle.flush()
+        #
+        #     self.module.log(f"  - move '{tmp_name}' to '{data_file}'")
+        #     os.replace(tmp_name, data_file)
+        #
+        # except (FileNotFoundError, NotADirectoryError, PermissionError, OSError) as exc:
+        #     self.module.log(f"ERROR: Temporary file handling failed: {exc}")
+        #
+        #     if tmp_name:
+        #         try:
+        #             os.unlink(tmp_name)
+        #         except FileNotFoundError:
+        #             pass
+        #         except OSError as cleanup_exc:
+        #             self.module.log(f"ERROR: Cleanup of temporary file failed: {cleanup_exc}")
+        #
+        #     # raise
+
+
+        # try:
+        #     with NamedTemporaryFile(
+        #         "w",
+        #         delete=False,
+        #         dir=str(data_path.parent),
+        #         encoding="utf-8",
+        #     ) as file_handle:
+        #         file_handle.write(data)
+        #         tmp_name = file_handle.name
+        #
+        #         self.module.log(f"  - tmp_name: {tmp_name}")
+        #
+        # except RuntimeError as exc:
+        #     self.module.log(f"Caught runtime error: {exc}")
+        #
+        # except OSError as e:
+        #     self.module.log(f"ERROR: {e}")
+        #
+        # finally:
+        #     if file_handle:
+        #         self.module.log(f"  - move '{tmp_name}' to '{data_file}'")
+        #         os.replace(tmp_name, data_file)
+
+        # file_handle = None
+        # checksum_path = Path(checksum_file)
+        # checksum_path.parent.mkdir(parents=True, exist_ok=True)
+        #
+        # with NamedTemporaryFile(
+        #     "w",
+        #     delete=False,
+        #     dir=str(checksum_path.parent),
+        #     encoding="utf-8",
+        # ) as file_handle:
+        #     file_handle.write(checksum)
+        #     tmp_checksum = file_handle.name
+        #
+        # except OSError as e:
+        #     self.module.log(f"ERROR: {e}")
+        #
+        # finally:
+        #     if file_handle:
+        #         # os.replace(tmp_name, data_file)
+        #         os.replace(tmp_checksum, data_file)
 
     def __checksum(self, plaintext: str) -> str:
         """Compute a SHA-256 checksum for text content.
@@ -824,6 +986,8 @@ class PHPModules(object):
         Returns:
             Tuple of C(changed), C(new_checksum), and C(old_checksum).
         """
+        self.module.log(f"PHPModules::__has_changed(data_file: {data_file}, checksum_file: {checksum_file}, rendered_data)")
+
         old_checksum = ""
 
         if not os.path.exists(data_file) and os.path.exists(checksum_file):
@@ -842,6 +1006,10 @@ class PHPModules(object):
         if os.path.exists(data_file):
             with open(data_file, "r", encoding="utf-8") as file_handle:
                 file_checksum = self.__checksum(file_handle.read())
+
+        self.module.log(f"  - new_checksum : {new_checksum}")
+        self.module.log(f"  - old_checksum : {old_checksum}")
+        self.module.log(f"  - file_checksum: {file_checksum}")
 
         changed = (old_checksum != new_checksum) or (
             file_checksum is not None and file_checksum != new_checksum

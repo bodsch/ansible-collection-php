@@ -18,6 +18,7 @@ is improved for readability, typing, and more robust filesystem handling.
 from __future__ import absolute_import, division, print_function
 
 import os
+import re
 from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, Union, cast
 
@@ -610,6 +611,74 @@ class PHPModules(object):
         self.module.log(f"= result: {result}")
 
         return result
+
+    def __strtobool(self, val: Any) -> bool:
+        """Convert common truthy and falsy representations to bool.
+
+        Args:
+            val: Arbitrary value interpreted as a boolean.
+
+        Returns:
+            Normalized boolean value.
+
+        Raises:
+            ValueError: If the string value is not a known boolean representation.
+        """
+        if isinstance(val, bool):
+            return val
+
+        if isinstance(val, str):
+            normalized = val.lower()
+
+            if normalized in ("y", "yes", "t", "true", "on", "1"):
+                return True
+
+            if normalized in ("n", "no", "f", "false", "off", "0"):
+                return False
+
+            raise ValueError(f"invalid truth value {val}")
+
+        return bool(val)
+
+    def __php_version_tuple(self) -> Tuple[Optional[int], Optional[int], Optional[int]]:
+        """Parse the configured PHP version into major, minor, and patch numbers.
+
+        The parser is intentionally tolerant and accepts values such as:
+        - "8.5"
+        - "8.5.3"
+        - " 8.5.3 "
+        - "php-8.5.3"
+
+        Returns:
+            A tuple of (major, minor, patch). Missing components are returned as
+            None. If no version numbers can be extracted, all values are None.
+        """
+        if not self.php_version:
+            return None, None, None
+
+        match = re.search(r"(\d+)\.(\d+)(?:\.(\d+))?", self.php_version)
+        if not match:
+            return None, None, None
+
+        major = int(match.group(1))
+        minor = int(match.group(2))
+        patch = int(match.group(3)) if match.group(3) is not None else None
+
+        return major, minor, patch
+
+    def __is_php_branch(self, major: int, minor: int) -> bool:
+        """Check whether the configured PHP version belongs to a specific branch.
+
+        Args:
+            major: Expected PHP major version.
+            minor: Expected PHP minor version.
+
+        Returns:
+            True if the configured version matches the requested major/minor branch,
+            otherwise False.
+        """
+        current_major, current_minor, _ = self.__php_version_tuple()
+        return current_major == major and current_minor == minor
 
 
 def main() -> None:

@@ -638,7 +638,9 @@ class ComposerInstaller:
         Returns:
             A path to the checksum cache file for the given target.
         """
-        self.module.log(f"ComposerInstaller::_checksum_cache_file(target: {str(target)})")
+        self.module.log(
+            f"ComposerInstaller::_checksum_cache_file(target: {str(target)})"
+        )
         # self.module.log(f"  {str(target.name)}")
         # safe_target = re.sub(r"[^A-Za-z0-9_.-]+", "_", str(target))
         target_path: Path = self.cache_directory / f"{target.name}.sha256"

@@ -14,7 +14,6 @@ from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import IO, Any, Optional, Union
 
-
 PathLike = Union[str, os.PathLike[str]]
 
 

@@ -68,9 +68,9 @@ php_modules:
     content: |
       extension=sqlite3
       extension=pdo_sqlite
-  # - name: pdo_mysql
-  #   enabled: false
-  #   priority: 30
+  - name: pdo_mysql
+    enabled: false
+    priority: 30
 
 php_packages:
   - php-gd

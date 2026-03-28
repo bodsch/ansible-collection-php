@@ -13,7 +13,6 @@ from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import IO, Any, Optional, Union
 
-
 PathLike = Union[str, os.PathLike[str]]
 
 
@@ -128,7 +127,11 @@ class AtomicFileWriter:
                     if cleanup_error is None:
                         cleanup_error = exc
 
-            if exc_type is None and cleanup_error is None and self._temp_name is not None:
+            if (
+                exc_type is None
+                and cleanup_error is None
+                and self._temp_name is not None
+            ):
                 os.replace(self._temp_name, self.destination)
                 self._fsync_parent_directory()
             elif self._temp_name is not None:

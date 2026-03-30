@@ -27,14 +27,14 @@
   tags:
     - php-fpm
 
-# - name: service
-#   ansible.builtin.include_tasks: service.yml
-#   tags:
-#     - php-fpm
-#
-# - name: ansible facts
-#   ansible.builtin.include_tasks: facts.yml
-#   tags:
-#     - php-fpm
+- name: service
+  ansible.builtin.include_tasks: service.yml
+  tags:
+    - php-fpm
+
+- name: ansible facts
+  ansible.builtin.include_tasks: facts.yml
+  tags:
+    - php-fpm
 
 ...

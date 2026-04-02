@@ -30,7 +30,7 @@ class PhpExtension:
     ) -> None:
 
         self.module = module
-        self.module.log(f"PhpExtension::__init__(php_binary: {php_binary})")
+        # self.module.log(f"PhpExtension::__init__(php_binary: {php_binary})")
 
         self.php_binary = php_binary
 
@@ -41,7 +41,7 @@ class PhpExtension:
             A tuple containing the detected extension directory and an optional
             error message.
         """
-        self.module.log("PhpExtension::find_extension_dir()")
+        # self.module.log("PhpExtension::find_extension_dir()")
 
         if not self.php_binary:
             return None, "PHP does not appear to be installed in the default paths."
@@ -69,9 +69,9 @@ class PhpExtension:
             C(True) if the extension can be considered available, otherwise
             C(False).
         """
-        self.module.log(
-            f"PhpExtension::extension_available(extension_directory: {extension_directory}, module_content: {module_content})"
-        )
+        # self.module.log(
+        #     f"PhpExtension::extension_available(extension_directory: {extension_directory}, module_content: {module_content})"
+        # )
 
         if not isinstance(module_content, str) or not module_content.strip():
             return False
@@ -83,7 +83,7 @@ class PhpExtension:
         ident = match.group("ident").strip()
         extension = match.group("extension").replace(".so", "").strip()
 
-        self.module.log(f"  - extension: {extension}")
+        # self.module.log(f"  - extension: {extension}")
 
         if ident == "zend_extension":
             return True
@@ -91,7 +91,7 @@ class PhpExtension:
         search = glob.glob(os.path.join(extension_directory, f"{extension}.*"))
 
         if search:
-            self.module.log(f"  - found: {search}")
+            # self.module.log(f"  - found: {search}")
             return True
 
         return False

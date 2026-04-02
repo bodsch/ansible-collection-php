@@ -31,6 +31,7 @@ from ansible_collections.bodsch.php.plugins.module_utils.php_extension import (
     PhpExtension,
 )
 from ansible_collections.bodsch.php.plugins.module_utils.php_module import PhpModule
+from ansible_collections.bodsch.php.plugins.module_utils.utils import strtobool
 
 # ---------------------------------------------------------------------------------------
 
@@ -312,7 +313,7 @@ class PHPModules(object):
         Returns:
             A result dictionary containing C(changed), C(failed), and C(msg).
         """
-        self.module.log("PHPModules::run()")
+        # self.module.log("PHPModules::run()")
 
         if not self.php_binary:
             return {
@@ -438,9 +439,9 @@ class PHPModules(object):
         Returns:
             C(True) when at least one path was removed, otherwise C(False).
         """
-        self.module.log(
-            f"PHPModules::disable_module(module_link_names: {module_link_names})"
-        )
+        # self.module.log(
+        #     f"PHPModules::disable_module(module_link_names: {module_link_names})"
+        # )
 
         changed = False
 
@@ -482,7 +483,7 @@ class PHPModules(object):
             definitions.append(
                 ModuleDefinition(
                     name=name,
-                    enabled=self.__strtobool(item.get("enabled", False)),
+                    enabled=strtobool(item.get("enabled", False)),
                     priority=priority,
                     content=content,
                 )
@@ -504,13 +505,13 @@ class PHPModules(object):
         Returns:
             Per-module result dictionary compatible with the current module output.
         """
-        self.module.log(
-            f"PHPModules::__process_module(module_definition: {module_definition}, extension_directory: {extension_directory})"
-        )
-
-        self.module.log(
-            f"=> module: {module_definition.name} , enabled: {module_definition.enabled} , prio: {module_definition.priority}"
-        )
+        # self.module.log(
+        #     f"PHPModules::__process_module(module_definition: {module_definition}, extension_directory: {extension_directory})"
+        # )
+        #
+        # self.module.log(
+        #     f"=> module: {module_definition.name} , enabled: {module_definition.enabled} , prio: {module_definition.priority}"
+        # )
 
         changed: bool = False
         changed_write: bool = False
@@ -549,14 +550,14 @@ class PHPModules(object):
             module_content=module_definition.content,
         )
 
-        self.module.log(
-            f"=> module: {module_definition.name}, installed: {module_installed}"
-        )
+        # self.module.log(
+        #     f"=> module: {module_definition.name}, installed: {module_installed}"
+        # )
 
         # deactivate module
         if not bool(module_definition.enabled) or not module_installed:
             """ """
-            self.module.log("    - disable module")
+            # self.module.log("    - disable module")
             changed_disable = self.disable_module(module_link_names)
 
             if changed_disable:
@@ -577,7 +578,7 @@ class PHPModules(object):
         # activate module
         if bool(module_definition.enabled) or module_installed:
             """ """
-            self.module.log("    - enable module")
+            # self.module.log("    - enable module")
 
             if module_definition.enabled and module_installed:
                 changed_enable, _details = self.enable_module(
@@ -608,37 +609,9 @@ class PHPModules(object):
                 "state": state_message,
             }
 
-        self.module.log(f"= result: {result}")
+        # self.module.log(f"= result: {result}")
 
         return result
-
-    def __strtobool(self, val: Any) -> bool:
-        """Convert common truthy and falsy representations to bool.
-
-        Args:
-            val: Arbitrary value interpreted as a boolean.
-
-        Returns:
-            Normalized boolean value.
-
-        Raises:
-            ValueError: If the string value is not a known boolean representation.
-        """
-        if isinstance(val, bool):
-            return val
-
-        if isinstance(val, str):
-            normalized = val.lower()
-
-            if normalized in ("y", "yes", "t", "true", "on", "1"):
-                return True
-
-            if normalized in ("n", "no", "f", "false", "off", "0"):
-                return False
-
-            raise ValueError(f"invalid truth value {val}")
-
-        return bool(val)
 
     def __php_version_tuple(self) -> Tuple[Optional[int], Optional[int], Optional[int]]:
         """Parse the configured PHP version into major, minor, and patch numbers.

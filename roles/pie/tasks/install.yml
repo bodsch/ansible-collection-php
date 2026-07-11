@@ -1,0 +1,54 @@
+---
+
+- name: ensure pie directory exists.
+  become: true
+  become_user: "{{ pie_home.owner }}"
+  ansible.builtin.file:
+    path: "{{ pie_home.path }}"
+    owner: "{{ pie_home.owner }}"
+    group: "{{ pie_home.group }}"
+    state: directory
+    mode: "0755"
+
+- name: install pie
+  bodsch.php.pie_installer:
+    # signature: https://pie.github.io/installer.sig
+    # installer: https://getpie.org/installer
+    version: "{{ pie_version | default('') }}"
+    version_branch: "--2.2"
+    self_update: "{{ pie_self_update | default('false') | bool }}"
+    # path: "{{  }}"
+  register: _pie_installer
+
+- name: install or remove configured globally-required packages
+  become: true
+  become_user: "{{ pie_home.owner }}"
+  environment:
+    COMPOSER_HOME: "{{ pie_home.path }}"
+  bodsch.php.pie_packages:
+    packages: "{{ pie_global_packages | default([]) }}"
+  register: pie_packages
+
+- name: add {{ pie_home.path }} bin directory to global $PATH.
+  ansible.builtin.template:
+    src: etc/profile.d/pie.sh.j2
+    dest: /etc/profile.d/pie.sh
+    mode: "0644"
+  when:
+    - pie_add_to_path | bool
+
+- name: add {{ pie_home.path }} bin directory to global $PATH.
+  ansible.builtin.template:
+    src: etc/profile.d/pie-project.sh.j2
+    dest: /etc/profile.d/pie-project.sh
+    mode: "0644"
+  when:
+    - pie_add_to_project_path | default('false') | bool
+
+- name: create custom fact file
+  bodsch.core.facts:
+    name: pie
+    facts:
+      version: "{{ _pie_installer.version }}"
+
+...

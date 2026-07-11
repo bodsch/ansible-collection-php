@@ -1,0 +1,10 @@
+---
+
+pie_global_packages:
+  - name: psr/log
+    state: present
+  - name: psr/cache
+    release: 3.0.0
+    state: present
+
+...

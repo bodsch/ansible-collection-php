@@ -1,0 +1,7 @@
+---
+
+php_pie_dependencies:
+  - python-urllib3
+  - python-requests
+
+...

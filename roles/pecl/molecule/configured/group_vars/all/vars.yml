@@ -1,24 +1,19 @@
 ---
 
 php_pecl_extensions:
-  # - name: APCu
-  #   version: 5.1.22
-  #   enabled: false
+  # redis is well maintained and builds against current PHP releases.
+  # No version is pinned so PECL installs the latest compatible release.
+  - name: redis
 
-  # - name: imagick
-  #   version: 3.7.0
-  #   dependencies:
-  #     - libmagickwand-dev
-
+  # memcached needs its build dependencies (including the zlib headers) and is
+  # installed non-interactively via configure_options, which answer PECL's
+  # interactive configure prompts in order.
   - name: memcached
-    version: 3.2.0
     dependencies:
       - libmemcached-dev
-      - libzstd-dev
-      - liblz-dev
-      - libzlcore-dev
-
-  - name: redis
-    version: 5.3.7
+      - zlib1g-dev
+    configure_options:
+      - ""      # libmemcached directory -> default (auto detect)
+      - "/usr"  # zlib directory
 
 ...

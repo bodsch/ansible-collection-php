@@ -7,10 +7,6 @@
       - '!any'
       - facter
 
-- name: d
-  debug:
-    msg: "{{ ansible_facts['ansible_local'] }}"
-
 # READ local_facts
 - name: set local fact for container
   ansible.builtin.set_fact:
@@ -21,10 +17,6 @@
     - ansible_facts['ansible_local'].php.version | length != 0
   tags:
     - php_pecl_install
-
-- name: d
-  debug:
-    msg: "{{ installed_php_version }}"
 
 - name: re-include OS specific configuration
   ansible.builtin.include_vars: "{{ lookup('first_found', params) }}"
@@ -108,10 +100,6 @@
       config_dirs: "{{ php_extension_conf_paths }}"
   register: php_pecl_pecl_result
 
-- name: d
-  debug:
-    msg: "{{ php_pecl_pecl_result }}"
-
 - name: install pecl extensions
   bodsch.php.pecl:
     state: install
@@ -129,7 +117,3 @@
 #       changed_when: php_pecl_pecl_result is succeeded
 #       failed_when: "not (('already installed' in php_pecl_pecl_result.stdout) or ('install ok:' in php_pecl_pecl_result.stdout))"
 #       loop: "{{ php_pecl_extensions }}"
-
-- name: d
-  debug:
-    msg: "{{ php_pecl_pecl_result }}"

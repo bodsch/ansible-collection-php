@@ -15,15 +15,17 @@ is improved for readability, typing, and more robust filesystem handling.
 # Apache-2.0 (see LICENSE or https://opensource.org/license/apache-2-0)
 # SPDX-License-Identifier: Apache-2.0
 
-from __future__ import absolute_import, division, print_function
+from __future__ import annotations
 
 import os
 import re
+from collections.abc import Mapping, Sequence
 from pathlib import Path
-from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, Union, cast
+from typing import Any, Protocol, cast
 
 from ansible.module_utils import distro
 from ansible.module_utils.basic import AnsibleModule
+from ansible_collections.bodsch.core.plugins.module_utils.module_results import results
 from ansible_collections.bodsch.php.plugins.module_utils.php_dataclasses import (
     ModuleDefinition,
 )
@@ -111,7 +113,7 @@ options:
     description:
       - List of PHP installation root directories.
       - For each entry, the module manages a symlink below C(conf.d).
-      - Example result path: C(/etc/php/8.2/cli/conf.d/10-opcache.ini).
+      - "Example result path: C(/etc/php/8.2/cli/conf.d/10-opcache.ini)."
     type: list
     elements: str
     required: true
@@ -222,7 +224,7 @@ failed:
   description:
     - Indicates whether module execution failed.
   returned: always
-  type: always
+  type: bool
   sample: false
 
 msg:
@@ -240,14 +242,6 @@ msg:
 
 # ---------------------------------------------------------------------------------------
 
-try:
-    from typing import Protocol
-except ImportError:  # pragma: no cover
-    try:
-        from typing_extensions import Protocol  # type: ignore
-    except ImportError:  # pragma: no cover
-        Protocol = object  # type: ignore[misc,assignment]
-
 
 class AnsibleModuleLike(Protocol):
     """Typing surface for the subset of AnsibleModule used by this helper."""
@@ -257,20 +251,20 @@ class AnsibleModuleLike(Protocol):
     def run_command(
         self,
         args: Sequence[str],
-        cwd: Optional[str] = None,
-        environ_update: Optional[Mapping[str, str]] = None,
+        cwd: str | None = None,
+        environ_update: Mapping[str, str] | None = None,
         check_rc: bool = True,
-    ) -> Tuple[int, str, str]:
+    ) -> tuple[int, str, str]:
         """Execute a command and return return code, stdout, and stderr."""
 
-    def get_bin_path(self, arg: str, required: bool = False) -> Optional[str]:
+    def get_bin_path(self, arg: str, required: bool = False) -> str | None:
         """Resolve a binary path from the remote execution environment."""
 
     def log(self, msg: str = "", **kwargs: Any) -> None:
         """Write a debug message to the Ansible log."""
 
 
-class PHPModules(object):
+class PHPModules:
     """Manage PHP module configuration files and activation symlinks.
 
     The class encapsulates all command execution and filesystem operations
@@ -297,7 +291,7 @@ class PHPModules(object):
         self.force: bool = bool(module.params.get("force", False))
         self.php_version = str(module.params.get("php_version", "")).strip()
 
-        self.php_binary: Optional[str] = self.module.get_bin_path("php", False)
+        self.php_binary: str | None = self.module.get_bin_path("php", False)
 
         self.distribution, self.version, self.codename = distro.linux_distribution(
             full_distribution_name=False
@@ -307,7 +301,7 @@ class PHPModules(object):
             if "php-legacy" in self.php_modules_path:
                 self.php_binary = self.module.get_bin_path("php-legacy", False)
 
-    def run(self) -> Dict[str, Any]:
+    def run(self) -> dict[str, Any]:
         """Execute the module logic and return an Ansible-compatible result.
 
         Returns:
@@ -338,7 +332,7 @@ class PHPModules(object):
             is_php_branch=self.__is_php_branch(8, 5),
         )
 
-        result_state: List[Dict[str, Any]] = []
+        result_state: list[dict[str, Any]] = []
 
         if isinstance(self.php_modules, list):
             for module_definition in self.__iter_module_definitions(self.php_modules):
@@ -352,15 +346,9 @@ class PHPModules(object):
 
                 result_state.append({module_definition.name: module_result})
 
-        changed = any(
-            isinstance(item, dict)
-            and isinstance(details, dict)
-            and bool(details.get("changed"))
-            for item in result_state
-            for details in item.values()
-        )
+        _, has_changed, has_failed, _, _, _ = results(self.module, result_state)
 
-        result = {"changed": changed, "failed": False, "msg": result_state}
+        result = {"changed": has_changed, "failed": has_failed, "msg": result_state}
 
         self.module.log(msg=f"= result {result}")
 
@@ -398,7 +386,7 @@ class PHPModules(object):
         self,
         module_file_name: str,
         module_link_names: Sequence[str],
-    ) -> Tuple[bool, Dict[str, Dict[str, Union[str, bool]]]]:
+    ) -> tuple[bool, dict[str, dict[str, str | bool]]]:
         """Ensure activation symlinks exist and point to the requested file.
 
         Args:
@@ -408,7 +396,7 @@ class PHPModules(object):
         Returns:
             A tuple containing a changed flag and per-link result details.
         """
-        result: Dict[str, Dict[str, Union[str, bool]]] = {}
+        result: dict[str, dict[str, str | bool]] = {}
         changed = False
 
         for link in module_link_names:
@@ -452,7 +440,7 @@ class PHPModules(object):
 
         return changed
 
-    def __iter_module_definitions(self, items: Sequence[Any]) -> List[ModuleDefinition]:
+    def __iter_module_definitions(self, items: Sequence[Any]) -> list[ModuleDefinition]:
         """Normalize raw module parameter entries into typed objects.
 
         Args:
@@ -461,7 +449,7 @@ class PHPModules(object):
         Returns:
             A list of normalized module definitions.
         """
-        definitions: List[ModuleDefinition] = []
+        definitions: list[ModuleDefinition] = []
 
         for item in items:
             if not isinstance(item, Mapping):
@@ -495,7 +483,7 @@ class PHPModules(object):
         self,
         module_definition: ModuleDefinition,
         extension_directory: str,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Synchronize one module definition and build its result payload.
 
         Args:
@@ -517,7 +505,7 @@ class PHPModules(object):
         changed_write: bool = False
         changed_enable: bool = False
         changed_disable: bool = False
-        state_message: Optional[str] = None
+        state_message: str | None = None
 
         module_file_name = os.path.join(
             self.php_modules_path,
@@ -569,7 +557,7 @@ class PHPModules(object):
                     changed = True
                     state_message = "Module successfully disabled."
 
-            result: Dict[str, Any] = {"changed": changed}
+            result: dict[str, Any] = {"changed": changed}
 
             if state_message:
                 result["state"] = state_message
@@ -595,7 +583,7 @@ class PHPModules(object):
 
             changed = changed_write or changed_enable or changed_disable
 
-            result: Dict[str, Any] = {"changed": changed}
+            result: dict[str, Any] = {"changed": changed}
             if state_message:
                 result["state"] = state_message
 
@@ -603,7 +591,7 @@ class PHPModules(object):
             """ """
             state_message = "The module should be enabled, but it is not installed."
 
-            result: Dict[str, Any] = {
+            result: dict[str, Any] = {
                 "changed": False,
                 "failed": True,
                 "state": state_message,
@@ -613,7 +601,7 @@ class PHPModules(object):
 
         return result
 
-    def __php_version_tuple(self) -> Tuple[Optional[int], Optional[int], Optional[int]]:
+    def __php_version_tuple(self) -> tuple[int | None, int | None, int | None]:
         """Parse the configured PHP version into major, minor, and patch numbers.
 
         The parser is intentionally tolerant and accepts values such as:
@@ -673,6 +661,10 @@ def main() -> None:
     result = helper.run()
 
     module.log(msg=f" = result : '{result}'")
+
+    if result.get("failed"):
+        module.fail_json(**result)
+
     module.exit_json(**result)
 
 

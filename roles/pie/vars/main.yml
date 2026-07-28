@@ -1,0 +1,7 @@
+---
+
+# Build tooling PIE needs to download, build, and install extensions.
+# Overridden per operating system in the OS specific vars files.
+pie_dependencies: []
+
+...

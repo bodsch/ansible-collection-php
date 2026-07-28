@@ -279,3 +279,22 @@ def test_ini_files(host, get_vars):
 #         f = host.file(_file)
 #         assert f.is_file
 #
+
+
+def test_ini_sapi_differentiation(host, get_vars):
+    """Per-SAPI overrides (php_ini_sapi) must produce different php.ini files."""
+    distribution = host.system_info.distribution
+
+    if distribution in ["arch", "artix"]:
+        pytest.skip("single php.ini layout, no per-SAPI differentiation")
+
+    package_version = local_facts(host).get("version").get("full")
+
+    cli_ini = host.file(f"/etc/php/{package_version}/cli/php.ini").content_string
+    fpm_ini = host.file(f"/etc/php/{package_version}/fpm/php.ini").content_string
+
+    assert 'memory_limit = "-1"' in cli_ini
+    assert 'memory_limit = "512M"' in fpm_ini
+    # the global 56M must have been overridden for both SAPIs
+    assert 'memory_limit = "56M"' not in cli_ini
+    assert 'memory_limit = "56M"' not in fpm_ini

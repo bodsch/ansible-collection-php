@@ -1,0 +1,12 @@
+---
+
+- name: remove build dependencies
+  become: true
+  ansible.builtin.package:
+    name: "{{ pie_dependencies }}"
+    state: absent
+  when:
+    - pie_remove_build_dependencies | default('false') | bool
+    - pie_dependencies | default([]) | count > 0
+
+...

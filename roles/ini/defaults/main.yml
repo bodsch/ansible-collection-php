@@ -2,7 +2,23 @@
 
 php_version: 8
 
-php_ini: []
+# Global php.ini overrides, applied to every SAPI (cli, fpm, apache2, ...).
+# Merged on top of php_ini_defaults (see vars/main.yml).
+php_ini: {}
+
+# Per-SAPI php.ini overrides, keyed by the SAPI name (the basename of each
+# entry in php_conf_paths, e.g. "cli" or "fpm"). Merged on top of the global
+# configuration for that SAPI only. Empty by default -> every SAPI is identical.
+#
+# php_ini_sapi:
+#   cli:
+#     PHP:
+#       memory_limit: "-1"
+#       display_errors: true
+#   fpm:
+#     PHP:
+#       max_execution_time: 120
+php_ini_sapi: {}
 
 php_use_managed_ini: true
 

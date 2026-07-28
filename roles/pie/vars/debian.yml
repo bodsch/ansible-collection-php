@@ -1,0 +1,14 @@
+---
+
+pie_dependencies:
+  - git
+  - unzip
+  - autoconf
+  - automake
+  - libtool
+  - m4
+  - make
+  - gcc
+  - php-dev
+
+...

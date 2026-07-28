@@ -1,0 +1,46 @@
+---
+
+- name: install pie
+  become: true
+  bodsch.php.pie_installer:
+    version: "{{ pie_version | default('') }}"
+    path: "{{ pie_install_path }}"
+    self_update: "{{ pie_self_update | default('false') | bool }}"
+  register: _pie_installer
+
+- name: install or remove configured php extensions
+  become: true
+  bodsch.php.pie_packages:
+    packages: "{{ pie_packages | default([]) }}"
+    php_config: "{{ pie_php_config if (pie_php_config | default('') | length > 0) else omit }}"
+    auto_install_build_tools: "{{ pie_auto_install_build_tools | default('false') | bool }}"
+    auto_install_system_dependencies: "{{ pie_auto_install_system_dependencies | default('false') | bool }}"
+  register: _pie_packages
+  when:
+    - pie_packages | default([]) | count > 0
+
+- name: add {{ pie_install_path }} to the global $PATH
+  become: true
+  ansible.builtin.template:
+    src: etc/profile.d/pie.sh.j2
+    dest: /etc/profile.d/pie.sh
+    mode: "0644"
+  when:
+    - pie_add_to_path | bool
+
+- name: remove global $PATH entry
+  become: true
+  ansible.builtin.file:
+    path: /etc/profile.d/pie.sh
+    state: absent
+  when:
+    - not (pie_add_to_path | bool)
+
+- name: create custom fact file
+  become: true
+  bodsch.core.facts:
+    name: pie
+    facts:
+      version: "{{ _pie_installer.version }}"
+
+...

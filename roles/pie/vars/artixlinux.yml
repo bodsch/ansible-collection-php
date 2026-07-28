@@ -1,0 +1,8 @@
+---
+
+pie_dependencies:
+  - git
+  - unzip
+  - base-devel
+
+...

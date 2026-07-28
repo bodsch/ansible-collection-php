@@ -84,4 +84,14 @@ php_ini:
   # ; absolute path.
   # ;curl.cainfo =
 
+# Per-SAPI overrides: cli and fpm get a different memory_limit than the
+# global 56M above.
+php_ini_sapi:
+  cli:
+    PHP:
+      memory_limit: "-1"
+  fpm:
+    PHP:
+      memory_limit: "512M"
+
 ...

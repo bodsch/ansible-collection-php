@@ -1,0 +1,21 @@
+---
+
+- name: prepare
+  ansible.builtin.include_tasks: prepare.yml
+  tags:
+    - php
+    - pie
+
+- name: install
+  ansible.builtin.include_tasks: install.yml
+  tags:
+    - php
+    - pie
+
+- name: cleanup
+  ansible.builtin.include_tasks: cleanup.yml
+  tags:
+    - php
+    - pie
+
+...

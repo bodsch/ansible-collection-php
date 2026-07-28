@@ -1,0 +1,12 @@
+---
+
+pie_add_to_path: true
+
+pie_auto_install_build_tools: true
+pie_auto_install_system_dependencies: true
+
+pie_packages:
+  - name: asgrim/example-pie-extension
+    state: present
+
+...

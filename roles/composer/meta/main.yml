@@ -1,7 +1,7 @@
 ---
 
 galaxy_info:
-  role_name: php
+  role_name: composer
   namespace: bodsch
 
   author: Bodo Schulz

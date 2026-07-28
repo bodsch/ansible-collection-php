@@ -36,20 +36,8 @@
     group: "{{ php_fpm_pool_group }}"
     mode: "0755"
 
-- name: create php.ini configuration files
-  ansible.builtin.template:
-    src: php.ini.j2
-    dest: "{{ item }}/php.ini"
-    owner: root
-    group: root
-    mode: "0644"
-    backup: true
-  loop:
-    "{{ php_conf_paths }}"
-  loop_control:
-    label: "{{ item }}"
-  when:
-    - php_use_managed_ini | bool
+# php.ini is intentionally NOT managed by this role. Use the bodsch.php.ini
+# role to manage php.ini (it supports per-SAPI configuration).
 
 - name: check if {{ php_fpm_pool_conf_path }} exists
   ansible.builtin.stat:

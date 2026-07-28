@@ -11,6 +11,12 @@ Supports PHP version 7 and 8, **as long as the corresponding versions are availa
 
 ArchLinux has removed the PHP 7 packages from their repository!
 
+> **Note**
+> This role does **not** manage `php.ini`. Use the `bodsch.php.ini` role for
+> `php.ini` (it supports global and per-SAPI configuration via `php_ini` /
+> `php_ini_sapi`). This role manages `php-fpm.conf`, pools, PHP modules and the
+> service.
+
 
 ## usage
 
@@ -36,40 +42,6 @@ php_fpm_pm:
   spare_servers:
     min: 5
     max: 5
-
-php_use_managed_ini: true
-
-php_expose_php: "On"
-php_memory_limit: "256M"
-php_max_execution_time: "60"
-php_max_input_time: "60"
-php_max_input_vars: "1000"
-php_realpath_cache_size: "32K"
-
-php_file_uploads: "On"
-php_upload_max_filesize: "64M"
-php_max_file_uploads: "20"
-
-php_post_max_size: "32M"
-php_date_timezone: "Europe/Berlin"
-php_allow_url_fopen: "On"
-
-php_sendmail_path: "/usr/sbin/sendmail -t -i"
-php_output_buffering: "4096"
-php_short_open_tag: "Off"
-php_disable_functions: []
-
-php_session_cookie_lifetime: 0
-php_session_gc_probability: 1
-php_session_gc_divisor: 1000
-php_session_gc_maxlifetime: 1440
-php_session_save_handler: files
-php_session_save_path: ''
-php_session_cache_expire: 180
-
-php_error_reporting: "E_ALL & ~E_DEPRECATED & ~E_STRICT"
-php_display_errors: "Off"
-php_display_startup_errors: "Off"
 
 php_packages: []
 

@@ -1,9 +1,9 @@
 #jinja2: trim_blocks: True, lstrip_blocks: True
 ; {{ ansible_managed }}
 
-{% set sections = php_ini.keys() %}
+{% set sections = php_ini_effective.keys() %}
 {% for section in sections %}
-  {% set _values = php_ini.get(section, {}) | bodsch.php.remove_empty_values %}
+  {% set _values = php_ini_effective.get(section, {}) | bodsch.php.remove_empty_values %}
   {% if _values %}
 
 [{{ section }}]

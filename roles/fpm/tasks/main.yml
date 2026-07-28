@@ -10,6 +10,7 @@
   tags:
     - php-fpm
   when:
+    - fpm_manage_repository | default(true) | bool
     - ansible_facts.os_family | lower == 'debian'
 
 - name: detect available php version

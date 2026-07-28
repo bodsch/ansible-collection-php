@@ -1,7 +1,14 @@
 ---
 
-php_pie_dependencies:
-  - python3-urllib3
-  - python3-requests
+pie_dependencies:
+  - git
+  - unzip
+  - autoconf
+  - automake
+  - libtool
+  - m4
+  - make
+  - gcc
+  - php-dev
 
 ...

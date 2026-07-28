@@ -1,11 +1,14 @@
-""" """
+"""
+Helpers to inspect PHP extension availability via the ``php`` binary.
+"""
 
 from __future__ import annotations
 
 import glob
 import os
 import re
-from typing import Any, Dict, Optional, Sequence, Tuple
+from collections.abc import Sequence
+from typing import Any
 
 # Example php -i output line:
 #   extension_dir => /usr/lib/php/20230831 => /usr/lib/php/20230831
@@ -21,7 +24,7 @@ _EXTENSION_RE = re.compile(
 
 
 class PhpExtension:
-    """ """
+    """Inspect the PHP extension directory and extension availability."""
 
     def __init__(
         self,
@@ -34,7 +37,7 @@ class PhpExtension:
 
         self.php_binary = php_binary
 
-    def find_extension_dir(self) -> Tuple[Optional[str], Optional[str]]:
+    def find_extension_dir(self) -> tuple[str | None, str | None]:
         """Determine the configured PHP extension directory.
 
         Returns:
@@ -99,9 +102,9 @@ class PhpExtension:
     def __exec(
         self,
         args: Sequence[str],
-        environ_update: Optional[Dict[str, str]] = None,
+        environ_update: dict[str, str] | None = None,
         check_rc: bool = True,
-    ) -> Tuple[int, str, str]:
+    ) -> tuple[int, str, str]:
         """Execute a prepared command via Ansible's C(run_command()) helper.
 
         Args:

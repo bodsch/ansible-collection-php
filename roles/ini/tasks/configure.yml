@@ -1,9 +1,5 @@
 ---
 
-- name: define dependecies
-  ansible.builtin.set_fact:
-    php_ini: "{{ php_ini_defaults | combine(php_ini, recursive=True) }}"
-
 # READ local_facts
 - name: set local fact for container
   ansible.builtin.set_fact:
@@ -39,6 +35,12 @@
     "{{ php_conf_paths }}"
   loop_control:
     label: "{{ item }}"
+  vars:
+    _sapi: "{{ item | basename }}"
+    php_ini_effective: >-
+      {{ php_ini_defaults
+         | combine(php_ini, recursive=True)
+         | combine(php_ini_sapi[_sapi] | default({}), recursive=True) }}
   when:
     - php_use_managed_ini | bool
 ...

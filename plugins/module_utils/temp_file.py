@@ -12,9 +12,10 @@ from __future__ import annotations
 import os
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from typing import IO, Any, Optional, Union
+from types import TracebackType
+from typing import IO, Any
 
-PathLike = Union[str, os.PathLike[str]]
+PathLike = str | os.PathLike[str]
 
 
 class WritableTempFile:
@@ -30,9 +31,9 @@ class WritableTempFile:
         self,
         mode: str = "w",
         *,
-        encoding: Optional[str] = "utf-8",
-        suffix: Optional[str] = None,
-        directory: Optional[PathLike] = None,
+        encoding: str | None = "utf-8",
+        suffix: str | None = None,
+        directory: PathLike | None = None,
         delete_on_exit: bool = True,
     ) -> None:
         """
@@ -64,7 +65,7 @@ class WritableTempFile:
         self.suffix = suffix
         self.directory = self._normalize_directory(directory)
         self.delete_on_exit = delete_on_exit
-        self.temp_file: Optional[IO[Any]] = None
+        self.temp_file: IO[Any] | None = None
 
     def __enter__(self) -> IO[Any]:
         """
@@ -86,7 +87,12 @@ class WritableTempFile:
         self.temp_file = NamedTemporaryFile(**kwargs)
         return self.temp_file
 
-    def __exit__(self, exc_type, exc_val, exc_tb) -> bool:
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
+    ) -> bool:
         """
         Close the temporary file and optionally remove it.
 
@@ -96,7 +102,7 @@ class WritableTempFile:
             Always ``False`` so that exceptions from the with-block are
             propagated to the caller.
         """
-        cleanup_error: Optional[BaseException] = None
+        cleanup_error: BaseException | None = None
 
         if self.temp_file is not None:
             try:
@@ -119,7 +125,7 @@ class WritableTempFile:
         return False
 
     @staticmethod
-    def _normalize_directory(directory: Optional[PathLike]) -> Optional[str]:
+    def _normalize_directory(directory: PathLike | None) -> str | None:
         """
         Normalize the optional directory argument to a string path.
 

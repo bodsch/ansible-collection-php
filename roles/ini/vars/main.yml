@@ -88,7 +88,7 @@ php_ini_defaults:
     ignore_user_abort: ""                           # true
     implicit_flush: false
     include_path: ""                                # ".:/php/includes"
-    include_path: ""                                # ".;c:\php\includes"
+    # include_path: ""                                # ".;c:\php\includes"
     input_encoding: ""                              #
     internal_encoding: ""                           #
     log_errors: true

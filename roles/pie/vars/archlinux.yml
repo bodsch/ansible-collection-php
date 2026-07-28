@@ -1,7 +1,8 @@
 ---
 
-php_pie_dependencies:
-  - python-urllib3
-  - python-requests
+pie_dependencies:
+  - git
+  - unzip
+  - base-devel
 
 ...

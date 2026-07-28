@@ -1,35 +1,26 @@
 ---
 
-- name: ensure pie directory exists.
-  become: true
-  become_user: "{{ pie_home.owner }}"
-  ansible.builtin.file:
-    path: "{{ pie_home.path }}"
-    owner: "{{ pie_home.owner }}"
-    group: "{{ pie_home.group }}"
-    state: directory
-    mode: "0755"
-
 - name: install pie
+  become: true
   bodsch.php.pie_installer:
-    # signature: https://pie.github.io/installer.sig
-    # installer: https://getpie.org/installer
     version: "{{ pie_version | default('') }}"
-    version_branch: "--2.2"
+    path: "{{ pie_install_path }}"
     self_update: "{{ pie_self_update | default('false') | bool }}"
-    # path: "{{  }}"
   register: _pie_installer
 
-- name: install or remove configured globally-required packages
+- name: install or remove configured php extensions
   become: true
-  become_user: "{{ pie_home.owner }}"
-  environment:
-    COMPOSER_HOME: "{{ pie_home.path }}"
   bodsch.php.pie_packages:
-    packages: "{{ pie_global_packages | default([]) }}"
-  register: pie_packages
+    packages: "{{ pie_packages | default([]) }}"
+    php_config: "{{ pie_php_config if (pie_php_config | default('') | length > 0) else omit }}"
+    auto_install_build_tools: "{{ pie_auto_install_build_tools | default('false') | bool }}"
+    auto_install_system_dependencies: "{{ pie_auto_install_system_dependencies | default('false') | bool }}"
+  register: _pie_packages
+  when:
+    - pie_packages | default([]) | count > 0
 
-- name: add {{ pie_home.path }} bin directory to global $PATH.
+- name: add {{ pie_install_path }} to the global $PATH
+  become: true
   ansible.builtin.template:
     src: etc/profile.d/pie.sh.j2
     dest: /etc/profile.d/pie.sh
@@ -37,15 +28,16 @@
   when:
     - pie_add_to_path | bool
 
-- name: add {{ pie_home.path }} bin directory to global $PATH.
-  ansible.builtin.template:
-    src: etc/profile.d/pie-project.sh.j2
-    dest: /etc/profile.d/pie-project.sh
-    mode: "0644"
+- name: remove global $PATH entry
+  become: true
+  ansible.builtin.file:
+    path: /etc/profile.d/pie.sh
+    state: absent
   when:
-    - pie_add_to_project_path | default('false') | bool
+    - not (pie_add_to_path | bool)
 
 - name: create custom fact file
+  become: true
   bodsch.core.facts:
     name: pie
     facts:

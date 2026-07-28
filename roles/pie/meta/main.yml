@@ -1,11 +1,11 @@
 ---
 
 galaxy_info:
-  role_name: php
+  role_name: pie
   namespace: bodsch
 
   author: Bodo Schulz
-  description: ansible role to install and configure php
+  description: ansible role to install php extensions with PIE (PHP Installer for Extensions)
 
   license: Apache
   min_ansible_version: "2.9"
@@ -28,8 +28,8 @@ galaxy_info:
     - programing
     - language
     - php
-    - fpm
-    - web
+    - pie
+    - extensions
 
 dependencies: []
 

@@ -13,14 +13,22 @@ from helper.molecule import get_vars, infra_hosts, local_facts
 @pytest.mark.parametrize(
     "files",
     [
-        # "/usr/local/bin/pie.phar",
         "/usr/local/bin/pie",
-        "/root/.cache/pie",
         "/root/.ansible/pie/pie.sha256",
-        "/root/.ansible/pie/pie-installer.sha384",
-        "/root/.ansible/pie/pie-installer.php",
+        "/etc/ansible/facts.d/pie.fact",
     ],
 )
 def test_files(host, files):
     f = host.file(files)
     assert f.exists
+
+
+def test_pie_is_executable(host):
+    pie = host.file("/usr/local/bin/pie")
+    assert pie.exists
+    assert pie.mode & 0o111
+
+
+def test_pie_runs(host):
+    cmd = host.run("php /usr/local/bin/pie --version --no-ansi")
+    assert cmd.rc == 0

@@ -1,25 +1,35 @@
 ---
 
-pie_version: "" # 2.8.3
+# Requested PIE version, e.g. "1.5.0". Empty installs the latest release.
+pie_version: ""
 
+# Force a PIE reinstall even if the requested state is already satisfied.
 pie_self_update: false
 
-pie_home:
-  path: '~/.pie'
-  owner: root
-  group: root
+# Directory the PIE binary is installed into. /usr/local/bin is already on
+# the default PATH, so pie_add_to_path can usually stay disabled.
+pie_install_path: /usr/local/bin
 
-pie_add_to_path: true
-pie_add_to_project_path: false
+# Add pie_install_path to the global PATH via /etc/profile.d/pie.sh.
+pie_add_to_path: false
 
-pie_project: {}
-#  path: ""
+# php-config binary of the target PHP installation for which extensions are
+# installed. Empty targets the PHP version used to run PIE itself.
+pie_php_config: ""
 
-pie_global_packages: []
-  # - name: psr/log
+# PHP extensions to install via PIE.
+pie_packages: []
+  # - name: xdebug/xdebug
+  #   release: "^3.4"
   #   state: present
-  # - name: psr/cache
-  #   release: 3.0.0
+  # - name: asgrim/example-pie-extension
   #   state: absent
+
+# Let PIE install missing build tools / system dependencies non-interactively.
+pie_auto_install_build_tools: false
+pie_auto_install_system_dependencies: false
+
+# Remove the build dependencies again during cleanup.
+pie_remove_build_dependencies: false
 
 ...

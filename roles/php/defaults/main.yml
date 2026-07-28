@@ -1,5 +1,9 @@
 ---
 
+# Manage the distribution PHP repository (Debian: deb.sury.org).
+# Set to false to let a dedicated role handle repository setup.
+php_manage_repository: true
+
 # choose your version!
 php_version: "8"
 

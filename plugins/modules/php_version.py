@@ -421,7 +421,10 @@ class PHPVersion(object):
     #     return rc, out, err
 
 
-def main():
+def main() -> None:
+    """
+    Entrypoint for the Ansible module.
+    """
     argument_spec = dict(
         package=dict(
             required=False,
@@ -437,7 +440,8 @@ def main():
 
     module = AnsibleModule(
         argument_spec=argument_spec,
-        supports_check_mode=False,
+        # read-only discovery module; no changes are made to the target host.
+        supports_check_mode=True,
     )
 
     helper = PHPVersion(module)

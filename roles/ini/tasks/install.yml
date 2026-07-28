@@ -17,8 +17,4 @@
     - detected_php_version.available.package_version is defined
     - detected_php_version.available.major_version is defined
 
-- name: d
-  debug:
-    msg: "{{ detected_php_version }}"
-
 ...
